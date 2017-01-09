@@ -5,7 +5,7 @@ from flask_mongoalchemy import MongoAlchemy
 from flask_restful import reqparse, abort, Api, Resource
 from eve import Eve
 
-from api import User, Users, Documents
+from api import User, Users, Documents, Document
 
 app = Flask(__name__)
 
@@ -41,6 +41,7 @@ restApi = Api(app)
 restApi.add_resource(Users, "/api/users/")
 restApi.add_resource(User, "/api/users/<string:userId>")
 restApi.add_resource(Documents, "/api/documents/")
+restApi.add_resource(Document, "/api/documents/<string:queryId>")
 
 
 if __name__ == "__main__":
