@@ -7,9 +7,9 @@ option.first{
 }
 </style>
 
-<div ng-controller="UserCtrl" class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main" ng-controller="UserCtrl">
 
-    <div class="row">
+    <div  class="row">
 
         <div class="col-md-8 panel panel-blue panel-widget">
 
@@ -35,7 +35,8 @@ option.first{
                 <div class="col-md-2 widget-right">
 
                     <div class="dropdown">
-                        <select ng-change="selectAction()" ng-model="myDropDown" class="form-control" >
+
+                         <select name="pickTopic" id="pickTopic" ng-change="selectAction()" ng-model="myDropDown" class="form-control" >
 
                               <option ng-repeat="i in usertopictitles" value="{{i}}">{{i}}</option>
 
@@ -67,24 +68,8 @@ option.first{
             </div>
         </div>
     </div>
-    <!--/.row-->
-     <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">Test</div>
-                <div class="panel-body">
-                          <div>
-			<p>The email adress is {{user.USER.email}}</p>
-			<p>The name is {{user.USER.name}}</p>
-		</div>
 
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--/.row-->
-
-    <div class="row">
+    <div class="row" ng-if="documentCollection.length">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">Latest News</div>
@@ -93,30 +78,16 @@ option.first{
 						<table class="table table-hover">
   <thead>
     <tr>
-      <th>#</th>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>Username</th>
+      <th style="width: 80%">Title</th>
+      <th style="width: 20%">Datum</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
+
+    <tr ng-repeat="items in documentCollection">
+		<td>{{items.title}}</td>
+		<td>{{items.date}}</td>
+	</tr>
   </tbody>
 </table>
 
@@ -128,7 +99,9 @@ option.first{
 
                 </div>
             </div>
-        </div>
+
     </div>
     <!--/.row-->
+
+
 
