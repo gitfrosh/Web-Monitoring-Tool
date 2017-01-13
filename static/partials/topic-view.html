@@ -1,31 +1,42 @@
-<style type="text/css">
-option.first{
-    display:none;
-    height:0;
-    visibility:hidden;
-    overflow:hidden;
+<style>.constrained {
+    height:900px;
+    overflow-y:scroll;
 }
 </style>
 
-<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main" ng-controller="UserCtrl">
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main constrained" ng-controller="UserCtrl">
 
     <div  class="row">
 
-        <div class="col-md-8 panel panel-blue panel-widget">
+        <div ng-if="!myDropDown" class="col-md-8 widget-left alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                        <span   class="sr-only">Error:</span>
+                        Wählen Sie ein Thema aus <br>oder legen Sie ein neues Thema an:
+                        </div>
 
 
-            <div class="col-md-6" ng-if="myDropDown != null">
+
+        <div class="col-md-8 panel panel-blue panel-widget" ng-if="myDropDown" >
+
+
+            <div class="col-md-6">
                 <h2>{{myDropDown}}</h2>
             </div>
-            <div class="col-md-6 widget-right">
+            <div class="col-md-6 widget-right" >
 
-                <button type="button" class="btn btn-default">
+
+
+
+
+                <button type="button" class="btn btn-default" >
                     <span class="glyphicon glyphicon-ok-circle"></span>
                 </button>
 
                 <button type="button" class="btn btn-default">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Bearbeiten
                 </button>
+
+
 
             </div>
         </div>
@@ -56,7 +67,7 @@ option.first{
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" ng-if="myDropDown">
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">Trendradar</div>
@@ -72,10 +83,10 @@ option.first{
     <div class="row" ng-if="documentCollection.length">
         <div class="col-lg-12">
             <div class="panel panel-default">
-                <div class="panel-heading">Latest News</div>
+                <div class="panel-heading">Latest News BÄm</div>
                 <div class="panel-body">
 
-						<table class="table table-hover">
+						<table class="table table-hover" infinite-scroll="increaseLimit()" infinite-scroll-container='".constrained"'>
   <thead>
     <tr>
       <th style="width: 80%">Title</th>
@@ -84,9 +95,9 @@ option.first{
   </thead>
   <tbody>
 
-    <tr ng-repeat="items in documentCollection">
-		<td>{{items.title}}</td>
-		<td>{{items.date}}</td>
+    <tr ng-repeat="item in documentCollection | limitTo:barLimit" ng-click="selectDocument(item)">
+		<td>{{item.title}}</td>
+		<td>{{item.date}}</td>
 	</tr>
   </tbody>
 </table>

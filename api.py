@@ -60,7 +60,7 @@ class Documents(Resource):
         from app import mongo
 
         # ObjectID cannot be JSONified, so it's always zero
-        cursor = mongo.db.documents.find({}).limit(10)
+        cursor = mongo.db.documents.find({})
 
         for document in cursor:
             data.append(document)
@@ -89,7 +89,19 @@ class Document(Resource):
         return json.loads(json_util.dumps({"DOCUMENTS": data}))
 
 
+class DocumentbyID(Resource):
+    # find specific document depending on ID
 
+    def get(self, documentId):
+        data = []
+
+        from app import mongo
+
+        data = mongo.db.documents.find_one({'_id': ObjectId(documentId)})
+
+        data_sanitized = json.loads(json_util.dumps(data))
+
+        return ({"DOCUMENT": data_sanitized})
 
 
 

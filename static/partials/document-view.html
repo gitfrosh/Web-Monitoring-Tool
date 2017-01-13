@@ -1,0 +1,226 @@
+<style>
+
+
+    button {display:inline-block; margin-right:3px; margin-top: 3px}
+
+    .badge-notify{
+   background:red;
+   position:relative;
+   top: -20px;
+   left: -25px;}
+
+
+</style>
+
+
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main" ng-controller="DocumentCtrl">
+
+    <div  class="row">
+
+        <div class="col-md-8 panel panel-blue panel-widget">
+
+            <div class="col-md-6 widget-right">
+                          <button ng-click="" type="button" class="btn btn-md btn-primary">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> {{item}}
+                    </button>
+               <button ng-click="" type="button" class="btn btn-md btn-primary">
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> {{item}}
+                    </button>
+                <button ng-click="" type="button" class="btn btn-md btn-primary">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> {{item}}
+                    </button>
+            </div>
+        </div>
+
+        <div class="row no-padding">
+            <div class="panel panel-blue panel-widget">
+                <div class="col-md-2 widget-right">
+
+                    <div class="dropdown">
+
+                         <select name="pickTopic" id="pickTopic" ng-change="selectAction()" ng-model="myDropDown" class="form-control" >
+
+                              <option ng-repeat="i in usertopictitles" value="{{i}}">{{i}}</option>
+
+                        </select>
+                                       </div>
+
+                </div>
+                <div class="col-md-2 widget-left ">
+                    <a href="#">
+                        <svg class="glyph stroked plus sign " style="color:white">
+                            <use xlink:href="#stroked-plus-sign" />
+                        </svg>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">{{document.DOCUMENT.title}}</div>
+                <div class="panel-body">
+                    <p style="font-size: small">{{document.DOCUMENT.date}}</p>
+
+                 {{document.DOCUMENT.abstract}}
+
+					</div>
+</div>
+
+        </div>
+
+                </div>
+
+       <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">Tags</div>
+                <div class="panel-body">
+
+                    <button ng-repeat="item in document.DOCUMENT.tags_system track by $index" ng-click="" type="button" class="btn btn-md btn-primary btn-rounded">
+                        <span class="glyphicon glyphicon-tag" aria-hidden="true"></span> {{item}}
+                    </button>
+
+					</div>
+</div>
+
+        </div>
+
+           <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">New Tag</div>
+                <div class="panel-body">
+                <form name="tagForm" ng-submit="submitTagForm()">
+                         <div class="form-group">
+                             <input ng-pattern="/^[a-zA-Z\s]*$/" required name="newTag" ng-model="newTag" style="width:180px;max-width:180px;display:inline-block"
+                                    type="text" class="form-control" id="newUserTag">
+                             <button type="submit" class="btn btn-default">Submit</button>
+                              <p class="alert alert-danger" ng-show="tagForm.newTag.$error.pattern"> <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Tags dürfen nur Buchstaben enthalten.</p>
+                            </div></form>
+
+
+					</div>
+</div>
+
+        </div>
+
+
+
+                </div>
+
+
+     <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">Tools</div>
+                <div class="panel-body" ng-init="initButtons()">
+
+                    <button ng-if="userBookmark.status == true" ng-click="changeBookmark();" type="button" class="btn btn-lg btn-default">
+                        <span class="glyphicon glyphicon-star" style="color: red" aria-hidden="true"></span>
+                    </button>
+
+                    <button ng-if="userBookmark.status == false" ng-click="changeBookmark();" type="button" class="btn btn-lg btn-default">
+                        <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
+                    </button>
+
+
+                    <button ng-click="" type="button" class="btn btn-lg btn-default">
+                        <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+                    </button>
+                     <a href="{{document.DOCUMENT.url}}" target="_blank"><button type="button" class="btn btn-lg btn-default">
+                        <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+                    </button></a>
+
+                     <button ng-click="toggleCommentArea();" class="btn btn-default btn-lg btn-link" >
+                        <span class="glyphicon glyphicon-comment"></span>
+                            </button><span class="badge badge-notify">{{userComments.length}}</span>
+
+           <!-- <button ng-click="" type="button" class="btn btn-lg btn-default">
+                        <span class=" glyphicon glyphicon-th-large" aria-hidden="true"></span>
+                    </button><span class="badge badge-notify">2</span>-->
+
+
+					</div>
+</div>
+
+        </div>
+
+
+
+
+
+                </div>
+
+
+    <div class="row" ng-if="commentAreaToggledOn == true">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">Kommentare</div>
+                <div class="panel-body">
+
+                <div class="media" ng-repeat="item in userComments">
+                    <span class="pull-left" href="#">
+                        <img class="media-object" src="http://placehold.it/64x64" alt="">
+                    </span>
+                    <div class="media-body">
+                        {{item}}
+                        <br><small>gepostet von {{user.USER.name}} </small>
+                        <br>
+                    </div>
+                </div>
+
+                    <div>
+
+                         <form name="commentForm" ng-submit="submitCommentForm()">
+                         <div class="form-group">
+                            <br>
+                                <textarea ng-pattern="/^[a-zA-Z0-9]*$/" class="form-control"  ng-model="newComment"
+                                          required name="newComment" id="newUserComment" rows="5"
+                                          placeholder="Ein Kommentar hinzufügen.."></textarea>
+                             <br>
+                             <button type="submit" class="btn btn-default">Submit</button>
+                             <p class="alert alert-danger" ng-show="commentForm.newComment.$error.pattern">
+                                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Keine Sonderzeichen!</p>
+
+                            </div></form>
+
+
+
+
+
+                    </div>
+
+
+
+
+
+
+
+
+					</div>
+</div>
+
+        </div>
+
+
+
+
+
+                </div>
+
+
+
+
+
+
+            </div>
+
+    </div>
+    <!--/.row-->
+
+
+
