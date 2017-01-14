@@ -1,11 +1,8 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template
 from flask.ext.pymongo import PyMongo
-from pymongo import MongoClient
-from flask_mongoalchemy import MongoAlchemy
 from flask_restful import reqparse, abort, Api, Resource
-from eve import Eve
-
-from api import User, Users, Documents, Document, DocumentbyID
+from api.document import *
+from api.user import *
 
 app = Flask(__name__)
 
@@ -38,11 +35,60 @@ def page_not_found(e):
 
 # Setup the Api here
 restApi = Api(app)
-restApi.add_resource(Users, "/api/users/")
+
+##################### user specific
+# GET
+restApi.add_resource(AllUsers, "/api/users/")
 restApi.add_resource(User, "/api/users/<string:userId>")
-restApi.add_resource(Documents, "/api/documents/")
-restApi.add_resource(Document, "/api/documents/<string:queryId>") # rename in api/documents/querys/
+
+# POST
+# new user, maybe later
+
+# DELETE
+# we don't need for now
+
+# PUT
+# update user's data // we need this to create new topics
+
+
+#################### query specific
+
+# POST
+# new query (when topic is created in user's data)
+
+# GET
+# we don't need for now
+
+# DELETE
+# we don't need for now
+
+# PUT
+# update querys (needed for status)
+
+#################### document specific
+
+# POST
+# web monitoring backend API
+
+# GET
+restApi.add_resource(AllDocuments, "/api/documents/")
+restApi.add_resource(DocumentsByQuery, "/api/documents/<string:queryId>") # rename in api/documents/querys/
 restApi.add_resource(DocumentbyID, "/api/document/<string:documentId>")
+
+# PUT
+restApi.add_resource(DocumentbyIDUserComment, "/api/document/<string:documentId>/newComment")
+restApi.add_resource(DocumentbyIDUserBookmark, "/api/document/<string:documentId>/newBookmark")
+restApi.add_resource(DocumentbyIDUserTag, "/api/document/<string:documentId>/newTag")
+restApi.add_resource(DocumentbyIDSource, "/api/document/<string:documentId>/newSource")
+
+# DELETE (we don't need, documents won't be deleted)
+
+#################### sources specific
+
+# this is very low priority!
+
+
+# STARTS THE SERVER!
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)

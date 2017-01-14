@@ -117,7 +117,7 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">Tools</div>
-                <div class="panel-body" ng-init="initButtons()">
+                <div class="panel-body">
 
                     <button ng-if="userBookmark.status == true" ng-click="changeBookmark();" type="button" class="btn btn-lg btn-default">
                         <span class="glyphicon glyphicon-star" style="color: red" aria-hidden="true"></span>
@@ -149,20 +149,16 @@
 
         </div>
 
-
-
-
-
                 </div>
 
 
-    <div class="row" ng-if="commentAreaToggledOn == true">
+    <div class="row" ng-show="commentAreaToggledOn.status == true">
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">Kommentare</div>
                 <div class="panel-body">
 
-                <div class="media" ng-repeat="item in userComments">
+                <div class="media" ng-repeat="item in userComments track by $index">
                     <span class="pull-left" href="#">
                         <img class="media-object" src="http://placehold.it/64x64" alt="">
                     </span>

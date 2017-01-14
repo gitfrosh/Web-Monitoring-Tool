@@ -12,6 +12,7 @@ var myApp = angular.module('myApp', [
 
 myApp.factory('Api', ['$resource',
     function($resource) {
+
         return {
             Document: $resource('/api/documents/:query', {
                 query: '@query',
@@ -21,14 +22,45 @@ myApp.factory('Api', ['$resource',
                 id: '@id',
                 method: "GET"
             }),
+            DocumentbyIDUserComment: $resource('/api/document/:id/newComment', {}, {
+                update: {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8'
+                    },
+                    id: '@id'
+                        //data: Body of request is sent through Controller
+                }
+            }),
             User: $resource('/api/users/:id', {
-                id: '@id',
-                method: "GET"
-            })
+                    id: '@id',
+                    method: "GET"
+                })
+                // http://stackoverflow.com/questions/35703804/post-a-json-array-with-angularjs-resource
 
         };
     }
 ]);
+
+// ///////////////////////////////////////////////Controllers
+
+// based on: http://stackoverflow.com/questions/18275118/how-to-update-a-list-after-a-database-operation-in-angularjs
+myApp.service('DocumentService', function($rootScope, Api) {
+    var document = [];
+
+    this.setDocument = function() {
+        document = Api.DocumentbyId.get({
+            id: param1
+        });
+        $rootScope.$broadcast('upddocument', document);
+    };
+    this.getDocument = function() {
+        document = Api.DocumentbyId.get({
+            id: param1
+        });
+        return document;
+    };
+});
 
 
 
@@ -70,7 +102,7 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
         id: loggedInUser.userId
     }, function(data) {
         $scope.user = data;
-        //console.log($scope.user);
+        console.log($scope.user);
 
         // now give only the user's topics
         $scope.usertopics = data.USER.topics;
@@ -111,11 +143,11 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
         // for every saved query-ID find connected documents
         for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
 
-            console.log($scope.iDsOfquerysForSelectedTopic[i].$oid);
+            //console.log($scope.iDsOfquerysForSelectedTopic[i].$oid);
 
             // start a fresh documentCollection for our output table
             $scope.documentCollection = [];
-            console.log($scope.documentCollection);
+            //console.log($scope.documentCollection);
 
             // get the documents
             Api.Document.get({
@@ -134,10 +166,6 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
 
                     console.log($scope.documentCollection);
                 }
-
-
-
-
             )
         }
 
@@ -165,97 +193,152 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
 //////////////////Controller: DocumentCtrl
 myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', 'loggedInUser', function($scope, $routeParams, Api, loggedInUser) {
     var param = $routeParams.itemId;
-    console.log(param);
+    //console.log(param);
     var userId = loggedInUser.userId;
 
+    // initiate some variables
+    $scope.allComments = [];
+    $scope.userComments = [];
+    $scope.allBookmarks = [];
+    $scope.userBookmark = [];
+    $scope.userBookmark.status = false; // default
 
 
-    // get the specific document and all its content
-    Api.DocumentbyId.get({
-        id: param
+    // and set the comment area off when loading the page
+    $scope.commentAreaToggledOn = [];
+    $scope.commentAreaToggledOn.status = false;
 
-    }, function(data) {
-        $scope.document = data;
 
-        // get comments of the logged in user
-        // first, get all comments (can be re-used in collaboration mode)
+
+    //load document data (bookmarks, comments, tags ..)
+    loadData();
+
+
+
+    function loadData() {
+
+        // set containers empty so that we can freshly reload the page if necessary
         $scope.allComments = [];
         $scope.userComments = [];
-        $scope.allComments = $scope.document.DOCUMENT.comments;
 
-        // push all comments of specific user in array
-        for (var i = 0, l = $scope.allComments.length; i < l; i++) {
+        console.log("Loading data in view....");
 
-            if ($scope.allComments[i].c_user == userId) {
+        // danger! asynchonous task!
+        var response = Api.DocumentbyId.get({
+            id: param
+        }, function() {
+            console.log("GET items from server....");
+        });
 
-                $scope.userComments.push($scope.allComments[i].text);
-                console.log($scope.userComments);
-            }
+        response.$promise.then(function(data) {
+            $scope.document = data; //
+
+            console.log($scope.document);
+
+            // get comments of the logged in user
+            // first, get all comments (can be re-used in collaboration mode)
+
+            $scope.allComments = $scope.document.DOCUMENT.comments;
+
+            console.log($scope.allComments.length);
 
 
-        }
+            // push all comments of specific user in array
+            for (var i = 0, l = $scope.allComments.length; i < l; i++) {
 
-        // get bookmarks of the logged in user
-        // first, get all bookmarks
-        $scope.allBookmarks = [];
-        $scope.userBookmark = [];
-        $scope.userBookmark.status = false; // default
-        $scope.allBookmarks = $scope.document.DOCUMENT.bookmarks;
+                if ($scope.allComments[i].c_user == userId) {
 
-        // and set the comment area off for now
-        $scope.commentAreaToggledOn = false;
+                    $scope.userComments.push($scope.allComments[i].text);
+                    console.log($scope.userComments);
+                }
 
-        // push all Bookmarks of specific user in array
-        for (var a = 0, le = $scope.allBookmarks.length; a < le; a++) {
-
-            if ($scope.allBookmarks[a].b_user == userId) {
-
-                    // initiate the marked icon (star) in view
-                    $scope.initButtons = function(){
-                          $scope.userBookmark.status = true;
-                          $scope.commentAreaToggledOn = false;
-                          console.log($scope.userBookmark.status);
-                };
 
             }
 
+            // get bookmarks of the logged in user
+            // first, get all bookmarks
 
-        }
-
-    });
-
-
-
-      // react on click on icon star in view
-      $scope.changeBookmark = function(){
-              $scope.userBookmark.status = !$scope.userBookmark.status;
-          console.log($scope.userBookmark.status);
-            };
-
-      // toggle comment area on and off
-      $scope.toggleCommentArea = function(){
-              $scope.commentAreaToggledOn = !$scope.commentAreaToggledOn;
-              console.log($scope.commentAreaToggledOn);
-            };
-
-      // Tag form process
-      $scope.submitTagForm = function() {
-          console.log($scope.newTag);
-          console.log(userId);
+            $scope.allBookmarks = $scope.document.DOCUMENT.bookmarks;
 
 
-      };
+
+            // remember the Bookmark of specific user
+            for (var a = 0, le = $scope.allBookmarks.length; a < le; a++) {
+
+                if ($scope.allBookmarks[a].b_user == userId) {
+
+                    console.log($scope.allBookmarks[a].b_user);
+
+                    if ($scope.allBookmarks[a].status == true) {
+
+                        // initiate the marked icon (star) in view (overwrites the initiate-function!!
+
+                        $scope.userBookmark.status = true;
+                        console.log($scope.userBookmark.status);
 
 
-           // Comment form process
-      $scope.submitCommentForm = function() {
-          console.log($scope.newComment); // doesn't work --- really strange!!!!!!!!!!!!!!!!!!!!!!!
-          //https://github.com/angular/angular.js/issues/6038
-          console.log(userId);
-
-      };
+                    }
 
 
+
+                }
+
+
+            }
+
+
+
+        });
+
+
+    }
+
+
+    // Some functions here...
+
+    // react on click on icon star in view
+    $scope.changeBookmark = function() {
+        $scope.userBookmark.status = !$scope.userBookmark.status;
+        console.log($scope.userBookmark.status);
+    };
+
+    // toggle comment area on and off
+    $scope.toggleCommentArea = function() {
+        $scope.commentAreaToggledOn.status = !$scope.commentAreaToggledOn.status;
+        console.log($scope.commentAreaToggledOn.status);
+    };
+
+    // Tag form process
+    $scope.submitTagForm = function() {
+        console.log($scope.newTag);
+        console.log(userId);
+
+
+    };
+
+    // Comment form process
+    $scope.submitCommentForm = function() {
+        console.log($scope.newComment); // does not work with ng-if!
+        console.log(userId);
+
+        var postData;
+        postData = {
+            "userId": userId,
+            "commentText": $scope.newComment
+        };
+        console.log(postData);
+
+        // put comment on the server, WHEN FINISHED load data once more
+        $scope.theNewComment = new Api.DocumentbyIDUserComment(postData);
+        $scope.theNewComment.$update({
+            id: param
+        }).then(function() {
+            loadData();
+        });
+
+
+
+    };
 
 
 
