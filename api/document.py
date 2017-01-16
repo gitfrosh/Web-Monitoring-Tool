@@ -114,9 +114,32 @@ class DocumentbyIDUserTag(Resource):
 
 
 class DocumentbyIDUserBookmark(Resource):
+    def put(self, documentId):
 
-    def put(self):
-        return
+        from app import mongo
+        parser = reqparse.RequestParser()
+        parser.add_argument('userId', type=str, required=True, help='No userId given',
+                            location='json')
+        parser.add_argument('bookmarkStatus', type=str, required=True, help='No bookmarkStatus given',
+                            location='json')  # try without location & action
+        request_params = parser.parse_args()
+        # result = process_the_request(request_params)
+
+        # unfortunately, we have to do two requests here: one, to delete ("pull") the existing bookmark for a specific user
+        # the second to add (push) the bookmark, the user has just chosen
+
+        result1 = mongo.db.documents.update({'_id': ObjectId(documentId)}, { '$pull': {'bookmarks': {'b_user': request_params['userId']}}})
+        result2 = mongo.db.documents.update({'_id': ObjectId(documentId)}, {
+           '$push': {"bookmarks": {"b_user": request_params['userId'], "status": request_params['bookmarkStatus']}}}, upsert=True)
+
+        response = {
+            'result1': result1,
+            'result2': result2,
+            'error_code': 0
+        }
+
+        data_sanitized = json.loads(json_util.dumps(response))
+        return data_sanitized
 
 class DocumentbyIDSource(Resource):
 

@@ -3,7 +3,7 @@
 // ///////////////////////////////////////////////Module
 
 var myApp = angular.module('myApp', [
-    'ngRoute', 'ngResource'
+    'ngRoute', 'ngResource', 'angular.filter'
 ]);
 
 
@@ -22,6 +22,16 @@ myApp.factory('Api', ['$resource',
                 id: '@id',
                 method: "GET"
             }),
+            DocumentbyIDUserBookmark: $resource('/api/document/:id/newBookmark', {}, {
+                update: {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8'
+                    },
+                    id: '@id'
+                        //data: Body of request is sent through Controller
+                }
+            }),
             DocumentbyIDUserComment: $resource('/api/document/:id/newComment', {}, {
                 update: {
                     method: "PUT",
@@ -36,32 +46,11 @@ myApp.factory('Api', ['$resource',
                     id: '@id',
                     method: "GET"
                 })
-                // http://stackoverflow.com/questions/35703804/post-a-json-array-with-angularjs-resource
+
 
         };
     }
 ]);
-
-// ///////////////////////////////////////////////Controllers
-
-// based on: http://stackoverflow.com/questions/18275118/how-to-update-a-list-after-a-database-operation-in-angularjs
-myApp.service('DocumentService', function($rootScope, Api) {
-    var document = [];
-
-    this.setDocument = function() {
-        document = Api.DocumentbyId.get({
-            id: param1
-        });
-        $rootScope.$broadcast('upddocument', document);
-    };
-    this.getDocument = function() {
-        document = Api.DocumentbyId.get({
-            id: param1
-        });
-        return document;
-    };
-});
-
 
 
 // ///////////////////////////////////////////////Controllers
@@ -78,9 +67,13 @@ myApp.controller('UserLoginCtrl', function($scope, Api, loggedInUser) {
 
 });
 
-//////////////////Controller: UserCtrl
-myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
+//////////////////Controller: TopicCtrl
+myApp.controller('TopicCtrl', function($scope, Api, $location, loggedInUser) {
+
     // this controller is actually too big and complex
+
+    var userId = loggedInUser.userId;
+
 
     // Get all users
     Api.User.query(function(data) {
@@ -108,8 +101,10 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
         $scope.usertopics = data.USER.topics;
 
 
+        //what does that do?
         $scope.getContent = function(usertopics) {
             return usertopics.value + " " + obj.text;
+
         };
 
 
@@ -120,6 +115,7 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
         for (var i = 0, l = $scope.usertopics.length; i < l; i++) {
             $scope.usertopictitles.push($scope.usertopics[i].title);
 
+
         }
 
         // default value of Dropdown: empty space for now
@@ -128,9 +124,10 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
 
     });
 
-    // actions to do on selected topic from Dropdown menu
-    $scope.selectAction = function() {
 
+
+    $scope.selectAction = function() {
+        // actions to do on selected topic from Dropdown menu
         // here give only the user's topics' querys - so that matching documents can be retrieved
         $scope.querysForSelectedTopic = _.find($scope.usertopics, function(item) {
             return item.title === $scope.myDropDown;
@@ -140,45 +137,117 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
         $scope.iDsOfquerysForSelectedTopic = $scope.querysForSelectedTopic.querys;
 
 
-        // for every saved query-ID find connected documents
-        for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
-
-            //console.log($scope.iDsOfquerysForSelectedTopic[i].$oid);
-
-            // start a fresh documentCollection for our output table
-            $scope.documentCollection = [];
-            //console.log($scope.documentCollection);
-
-            // get the documents
-            Api.Document.get({
-                    query: $scope.iDsOfquerysForSelectedTopic[i].$oid
-
-
-                }, function(data) {
-                    $scope.documents = data;
-
-
-                    // add outputs of more than one query to the collection
-                    $scope.documentCollection.push($scope.documents.DOCUMENTS);
-
-                    // flatten the array
-                    $scope.documentCollection = _.flatten($scope.documentCollection);
-
-                    console.log($scope.documentCollection);
-                }
-            )
-        }
-
-
-        $scope.barLimit = 5;
-        $scope.increaseLimit = function() {
-            $scope.barLimit += 5;
-            console.log('Increase Bar Limit', $scope.barLimit)
-        }
-
+        loadTable();
 
 
     };
+
+    function loadTable() {
+
+        // start a fresh documentCollection for our output table
+        $scope.documentCollection = [];
+        //console.log($scope.documentCollection);
+
+        for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
+
+
+
+            // get the documents
+            Api.Document.get({
+                query: $scope.iDsOfquerysForSelectedTopic[i].$oid
+
+
+            }, function(data) {
+                $scope.documents = data;
+
+
+                // add outputs of more than one query to the collection
+                $scope.documentCollection.push($scope.documents.DOCUMENTS);
+
+                // flatten the array
+                $scope.documentCollection = _.flatten($scope.documentCollection);
+
+                console.log($scope.documentCollection);
+            })
+        }
+    }
+
+
+    function loadOnlyBookmarked() {
+
+        // start a fresh documentCollection for our output table
+        $scope.rawDocumentCollection = [];
+        $scope.documentCollection = [];
+
+
+        for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
+
+
+            // get the documents
+            Api.Document.get({
+                query: $scope.iDsOfquerysForSelectedTopic[i].$oid
+
+
+            }, function(data) {
+                $scope.documents = data;
+
+                // add outputs of more than one query to the collection
+                $scope.rawDocumentCollection.push($scope.documents.DOCUMENTS);
+
+                // flatten the array
+                $scope.rawDocumentCollection = _.flatten($scope.rawDocumentCollection);
+
+                console.log($scope.rawDocumentCollection);
+
+                // push all bookmarked documents onto documentCollectionOnlyBookmarked
+                for (var i = 0, l = $scope.rawDocumentCollection.length; i < l; i++) {
+
+                    console.log($scope.rawDocumentCollection.length);
+
+                    for (var a = 0, le = $scope.rawDocumentCollection[i].bookmarks.length; a < le; a++) {
+
+                        console.log($scope.rawDocumentCollection[i].bookmarks[a]);
+
+                        if ($scope.rawDocumentCollection[i].bookmarks[a].b_user == userId && $scope.rawDocumentCollection[i].bookmarks[a].status == "True") {
+
+                        //console.log(rawDocumentCollection[i].bookmarks[a].b_user);
+
+                            $scope.documentCollection.push($scope.rawDocumentCollection[i]);
+                            console.log($scope.documentCollection);
+
+
+                    }
+
+                    }
+
+                }
+
+            })
+        }
+    }
+
+
+
+    $scope.filterBookmarks = function() {
+        console.log("true");
+        loadOnlyBookmarked()
+    };
+    $scope.showAll = function() {
+        console.log("unchecked");
+        loadTable()
+    };
+
+
+
+    // this is some stuff to handle the lazy load / infinite scroll
+    $scope.barLimit = 5;
+    $scope.increaseLimit = function() {
+        $scope.barLimit += 5;
+        console.log('Increase Bar Limit', $scope.barLimit)
+    };
+
+
+
 
     // select item in table and pass it to the document-view (template)
     $scope.selectDocument = function(item) {
@@ -190,21 +259,15 @@ myApp.controller('UserCtrl', function($scope, Api, $location, loggedInUser) {
 
 
 
-//////////////////Controller: DocumentCtrl
+
+//////////////////Controller: DocumentCtrl//////////////////////////////////////////////////////////////////////////////
 myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', 'loggedInUser', function($scope, $routeParams, Api, loggedInUser) {
     var param = $routeParams.itemId;
     //console.log(param);
     var userId = loggedInUser.userId;
 
-    // initiate some variables
-    $scope.allComments = [];
-    $scope.userComments = [];
-    $scope.allBookmarks = [];
-    $scope.userBookmark = [];
-    $scope.userBookmark.status = false; // default
 
-
-    // and set the comment area off when loading the page
+    // set the comment area off when loading the page
     $scope.commentAreaToggledOn = [];
     $scope.commentAreaToggledOn.status = false;
 
@@ -214,12 +277,14 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', 'loggedInUser
     loadData();
 
 
-
     function loadData() {
 
         // set containers empty so that we can freshly reload the page if necessary
         $scope.allComments = [];
         $scope.userComments = [];
+        $scope.allBookmarks = [];
+        $scope.userBookmark = [];
+        $scope.userBookmark.status = false; // default
 
         console.log("Loading data in view....");
 
@@ -260,22 +325,26 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', 'loggedInUser
 
             $scope.allBookmarks = $scope.document.DOCUMENT.bookmarks;
 
-
-
             // remember the Bookmark of specific user
             for (var a = 0, le = $scope.allBookmarks.length; a < le; a++) {
 
                 if ($scope.allBookmarks[a].b_user == userId) {
 
                     console.log($scope.allBookmarks[a].b_user);
+                    console.log($scope.allBookmarks[a]);
 
-                    if ($scope.allBookmarks[a].status == true) {
+                    if ($scope.allBookmarks[a].status == "True") {
+
+                        console.log($scope.allBookmarks[a].status);
 
                         // initiate the marked icon (star) in view (overwrites the initiate-function!!
 
                         $scope.userBookmark.status = true;
                         console.log($scope.userBookmark.status);
 
+
+                    } else {
+                        console.log($scope.allBookmarks[a].status);
 
                     }
 
@@ -300,6 +369,25 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', 'loggedInUser
     $scope.changeBookmark = function() {
         $scope.userBookmark.status = !$scope.userBookmark.status;
         console.log($scope.userBookmark.status);
+
+        var postData;
+        postData = {
+            "userId": userId,
+            "bookmarkStatus": $scope.userBookmark.status
+        };
+        console.log(postData);
+
+        // put comment on the server, WHEN FINISHED load data once more
+        $scope.theNewBookmark = new Api.DocumentbyIDUserBookmark(postData);
+        $scope.theNewBookmark.$update({
+            id: param
+        }).then(function() {
+            loadData();
+        });
+
+
+
+
     };
 
     // toggle comment area on and off
@@ -334,6 +422,8 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', 'loggedInUser
             id: param
         }).then(function() {
             loadData();
+            // form should be resetted here ...
+
         });
 
 
@@ -368,7 +458,7 @@ myApp.config(['$routeProvider',
             // get uUser topics in array from DB
             // show the first (if available), and fill in site elements
 
-            controller: 'UserCtrl',
+            controller: 'TopicCtrl',
             templateUrl: '../static/partials/topic-view.html',
         }).
         when('/dashboard/document/:itemId', {
