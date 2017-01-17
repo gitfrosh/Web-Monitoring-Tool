@@ -22,7 +22,6 @@ class AllDocuments(Resource):
 
         from app import mongo
 
-        # ObjectID cannot be JSONified, so it's always zero
         cursor = mongo.db.documents.find({})
 
         for document in cursor:
@@ -71,11 +70,7 @@ class DocumentbyID(Resource):
 
         from app import mongo
 
-        data = mongo.db.documents.find_one({'_id': ObjectId(documentId)})
-
-        data_sanitized = json.loads(json_util.dumps(data))
-
-        return ({"DOCUMENT": data_sanitized})
+        return
 
 class DocumentbyIDUserComment(Resource):
 
@@ -87,7 +82,7 @@ class DocumentbyIDUserComment(Resource):
         request_params = parser.parse_args()
         #result = process_the_request(request_params)
 
-        result = mongo.db.documents.update({'_id': ObjectId(documentId) }, { '$push': {"comments": {"c_user": request_params['userId'], "text": request_params['commentText']}}})
+        result = mongo.db.documents.update({'_id': ObjectId(documentId) }, { '$push': {"comments": {"c_user": ObjectId(request_params['userId']), "text": request_params['commentText']}}})
 
         response = {
              'result': result,
@@ -128,9 +123,9 @@ class DocumentbyIDUserBookmark(Resource):
         # unfortunately, we have to do two requests here: one, to delete ("pull") the existing bookmark for a specific user
         # the second to add (push) the bookmark, the user has just chosen
 
-        result1 = mongo.db.documents.update({'_id': ObjectId(documentId)}, { '$pull': {'bookmarks': {'b_user': request_params['userId']}}})
+        result1 = mongo.db.documents.update({'_id': ObjectId(documentId)}, { '$pull': {'bookmarks': {'b_user': ObjectId(request_params['userId'])}}})
         result2 = mongo.db.documents.update({'_id': ObjectId(documentId)}, {
-           '$push': {"bookmarks": {"b_user": request_params['userId'], "status": request_params['bookmarkStatus']}}}, upsert=True)
+           '$push': {"bookmarks": {"b_user": ObjectId(request_params['userId']), "status": request_params['bookmarkStatus']}}}, upsert=True)
 
         response = {
             'result1': result1,

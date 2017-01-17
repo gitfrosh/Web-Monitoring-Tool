@@ -59,3 +59,85 @@ class AllUsers(Resource):
         return json.loads(json_util.dumps({"USER": data}))
 
 
+class UserbyIDNewQuery(Resource):
+    # put new query in user's topic
+
+    def put(self, userId):
+
+        from app import mongo
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('query.id', type=str, required=True, help='No query id given',
+                            location='json')
+        parser.add_argument('topic.title', type=str, required=True, help='No topic title given',
+                            location='json')
+        request_params = parser.parse_args()
+
+        #result = mongo.db.users.update({'_id': ObjectId(userId), "topics.title": request_params['topic.title']}, {
+        #    '$push': {"topics.$.querys": {ObjectId(request_params['query.id'])}}})
+
+        result = mongo.db.users.update(
+            {'_id': ObjectId(userId), "topics.title": request_params['topic.title']},
+            {"$push":
+                {"topics.$.querys":
+                     ObjectId(request_params['query.id']),
+                }
+            }
+        )
+
+        response = {
+            'result1': result,
+            'error_code': 0
+        }
+
+        data_sanitized = json.loads(json_util.dumps(response))
+        return data_sanitized
+
+
+class UserbyIdTopic(Resource):
+    # put new topic or edit it in user's JSON
+
+    def put(self, userId):
+
+        from app import mongo
+        parser = reqparse.RequestParser()
+        parser.add_argument('topic.status', type=str, required=True, help='No topic status given',
+                            location='json')
+        parser.add_argument('topic.collaboration', type=str, required=True, help='No collaborationMode given',
+                            location='json')
+        parser.add_argument('topic.owner', type=str, required=True, help='No owner given',
+                            location='json')
+        parser.add_argument('topic.title', type=str, required=True, help='No title given',
+                            location='json')
+        parser.add_argument('oldtopic.title', type=str, required=False, help='No oldtitle given',
+                            location='json')
+        #parser.add_argument('topic.querys', type=list, required=False, help='No querys given',
+        #                    location='json')
+        request_params = parser.parse_args()
+
+        # unfortunately, we have to do two requests here: one, to delete ("pull") the existing topic for a specific user
+        # the second to add/rea-dd (push) the topic, the user has just created/modified
+
+        result1 = mongo.db.users.update({'_id': ObjectId(userId)},
+                                            {'$pull': {'topics': {'title': request_params['oldtopic.title']}}})
+        result2 = mongo.db.users.update({'_id': ObjectId(userId)}, {
+            '$push': {"topics": {"active": request_params['topic.status'], "collaboration": request_params['topic.collaboration'],
+                                 "owner": ObjectId(request_params['topic.owner']), "querys": [], "title": request_params['topic.title']}}},
+                                            upsert=True)
+        #result3 = mongo.db.users.update({'_id': ObjectId(userId), "topics.title": request_params['topic.title']}, {
+        #    '$push': {"topics.$.querys": request_params['topic.querys']}},
+        #                               upsert=True)
+
+        response = {
+            'result1': result1,
+            'result2': result2,
+          #  'result3': result3,
+            'error_code': 0
+        }
+
+        data_sanitized = json.loads(json_util.dumps(response))
+        return data_sanitized
+
+
+
+
