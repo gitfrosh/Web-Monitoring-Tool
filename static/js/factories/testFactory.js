@@ -31,3 +31,7 @@ angular.module('testFactory', [])
     };
 
 });
+
+// how to use this:
+// TestFactory.setQueryId("587236671eb3a4f927da77da");
+//        console.log(TestFactory.getQueryObject());

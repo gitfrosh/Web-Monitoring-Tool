@@ -5,11 +5,12 @@
 
 angular.module('docController', [])
 .controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 'loggedInUser', function($scope, $routeParams, Api, $location, loggedInUser) {
+
+    // we get the doc ID and the name of the current topic first, which were sent from topic view
     var param = $routeParams.itemId;
     var currentTopic = $location.search().paramA;
 
     var userId = loggedInUser.userId;
-
 
     // set the comment area off when loading the page
     $scope.commentAreaToggledOn = [];
@@ -113,12 +114,9 @@ angular.module('docController', [])
 
         console.log("Switch back to Topic view ...");
 
-        var paramA = currentTopic;
-        var route = '/dashboard/';
-        console.log(paramA);
-
-        // this is the redirection to the topic-view, we also send the current topic
-        $location.path(route).search({paramA: paramA})
+        // this is the redirection to the topic-view, we don't need to reassign paramA (current topic) cause it's still
+        // available through "search()"
+        $location.path('/dashboard/');//.search({paramA: paramA})
 
     };
 
@@ -159,6 +157,8 @@ angular.module('docController', [])
         console.log("Tag Form submitted ...");
         console.log($scope.newTag);
         console.log(userId);
+
+        // todo
 
 
     };

@@ -42,14 +42,34 @@ angular.module('topicController', [])
 
     initiateView();
 
+
+    function loadQuerys() {
+
+        if ($scope.myDropDown) { // if a topic was selected...
+            console.log("Lade Topic view with topic " + $scope.myDropDown);
+
+            // fetch the topic object from server and store it in "selectedTopic"
+            $scope.selectedTopic = _.find($scope.usertopics, function(item) {
+            return item.title === $scope.myDropDown;
+        });
+
+        // bind IDs of querys ...
+        $scope.iDsOfquerysForSelectedTopic = $scope.selectedTopic.querys;
+
+        console.log($scope.selectedTopic.querys);
+
+
+        loadTable(); // ... load table
+
+        } else { //... else do nothing
+            console.log("No topic selected");
+
+        }
+    }
+
+
+
     function initiateView() {
-
-
-
-        TestFactory.setQueryId("587236671eb3a4f927da77da");
-        console.log(TestFactory.getQueryObject());
-
-
 
 
          Api.User.get({
@@ -71,27 +91,7 @@ angular.module('topicController', [])
 
         console.log("Lade Topic view with topic " + $scope.myDropDown); // on first initiate this is empty!
 
-        //!********************************************************************************************************redundance!
-        if ($scope.myDropDown) { // if a topic was selected...
-            console.log("Lade Topic view with topic " + $scope.myDropDown);
-
-            // fetch the topic object from server and store it in "selectedTopic"
-            $scope.selectedTopic = _.find($scope.usertopics, function(item) {
-            return item.title === $scope.myDropDown;
-        });
-
-        // bind IDs of querys ...
-        $scope.iDsOfquerysForSelectedTopic = $scope.selectedTopic.querys;
-
-        console.log($scope.selectedTopic.querys);
-        //!********************************************************************************************************redundance!
-
-        loadTable(); // ... load table
-
-        } else { //... else do nothing
-            console.log("No topic selected");
-
-        }
+        loadQuerys();
 });
     }
 
@@ -104,24 +104,8 @@ angular.module('topicController', [])
         $scope.addTopicStatus = false;
         $scope.editTopicStatus = false;
 
+        loadQuerys();
 
-        //********************************************************************************************************redundance!
-
-
-         // fetch the topic object from server and store it in "selectedTopic"
-        $scope.selectedTopic = _.find($scope.usertopics, function(item) {
-            return item.title === $scope.myDropDown;
-        });
-
-         // here give only the user's topics' querys - so that matching documents can be retrieved
-        // bind IDs of querys ...
-        $scope.iDsOfquerysForSelectedTopic = $scope.selectedTopic.querys;
-
-        console.log($scope.selectedTopic.querys);
-         //********************************************************************************************************redundance!
-
-
-        loadTable();
 
 
     };
@@ -135,18 +119,17 @@ angular.module('topicController', [])
             $scope.myDropDown = "";
             $scope.selectedTopic = {};
             $scope.iDsOfquerysForSelectedTopic = {};
-
-
+            $scope.oldTopicTitle = "";
     };
-
-
 
 
       $scope.editTopic = function() {
         console.log("Clicked Edit Topic!");
 
-          // does not work!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
           $scope.checkboxStatus = {};
+          $scope.editTopicStatus = true;
+          $scope.documentCollection = [];
 
           if ($scope.selectedTopic.active == "True"){
                $scope.checkboxStatus.active = true
@@ -159,24 +142,6 @@ angular.module('topicController', [])
           } else {
               $scope.checkboxStatus.collab = false
           }
-
-
-
-            $scope.editTopicStatus = true;
-            $scope.documentCollection = [];
-
-         //********************************************************************************************************redundance!
-        // here give only the user's topics' querys
-        $scope.selectedTopic = _.find($scope.usertopics, function(item) {
-            return item.title === $scope.myDropDown;
-        });
-
-        // bind IDs of querys ...
-        $scope.iDsOfquerysForSelectedTopic = $scope.selectedTopic.querys;
-
-        console.log($scope.selectedTopic);
-        console.log($scope.selectedTopic.querys);
-         //********************************************************************************************************redundance!
 
 
          // now that we know the query IDs we must find the querys' objects (and the data; collab status, activeness
@@ -211,6 +176,129 @@ angular.module('topicController', [])
           }
 
 
+
+
+
+    };
+
+     // Topic form process
+    $scope.submitTopicForm = function() {
+
+        $scope.oldTopicTitle = $scope.myDropDown;
+
+        console.log("Topic Form submitted ...");
+        console.log($scope.checkboxStatus.collab);
+        console.log($scope.checkboxStatus.active);
+        console.log($scope.newTopicTitle);
+        console.log($scope.oldTopicTitle);
+        console.log($scope.selectedTopic.querys);
+
+        var postOldTitle = $scope.oldTopicTitle;
+
+        if ($scope.newTopicTitle === undefined){
+            var postDataTitle = $scope.oldTopicTitle;
+        }
+
+
+        // only remember the new topic title if user has entered one
+        if ($scope.newTopicTitle != $scope.oldTopicTitle && $scope.newTopicTitle != undefined) {
+            postDataTitle = $scope.newTopicTitle
+        } else {
+            postDataTitle =  $scope.oldTopicTitle;
+        }
+
+        /*if (!$scope.selectedTopic.querys.length) {
+            var sentQuerys = $scope.selectedTopic.querys;
+        } else {
+            sentQuerys = null;
+        }*/
+
+        var postData;
+        postData = {
+            "topic.status": $scope.checkboxStatus.active,
+            "topic.collaboration": $scope.checkboxStatus.collab,
+            "topic.owner": userId,
+            "topic.title": postDataTitle,
+            "oldtopic.title": postOldTitle
+            //"topic.querys" : $scope.selectedTopic.querys // we send this with an extra call
+        };
+        console.log(postData);
+
+
+        // put topic on the server, WHEN FINISHED load data once more
+        $scope.newOrEditedTopic = new Api.UserbyIdTopic(postData);
+        $scope.newOrEditedTopic.$update({
+            id: userId
+        }).then(function() {
+
+            if ($scope.oldTopicTitle){
+
+                for (var i = 0, l = $scope.selectedTopic.querys.length; i < l; i++) {
+
+                var postDataQuerys = {
+                        "topic.title": postDataTitle,
+                        "query.id" : $scope.selectedTopic.querys[i].$oid
+
+                    };
+                console.log(postDataQuerys);
+
+                $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys);
+                $scope.alsoPushedQuerys.$update({
+                    id: userId
+                }).then(function () {
+                    console.log("RESET!!");
+                    // form should be resetted here ...
+
+                });
+
+            }
+
+            } else {
+                console.log("This is a new topic. No query is pushed to db.");
+                console.log("User should now add the querys................");
+
+
+            }
+
+            if ($scope.newQuery) {
+
+                // check first if query is already available
+
+                console.log("user entered: " + $scope.newQuery);
+
+                var postDataQuerys2 = {
+                        "topic.title": postDataTitle,
+                        "query.id" : $scope.newQuery
+
+                    };
+                console.log(postDataQuerys2);
+
+
+                new Api.UserbyIDNewQuery(postDataQuerys2).$update({
+                    id: userId
+                }).then(function () {
+                    console.log("RESET!!");
+                    // form should be resetted here ...
+
+                });
+
+            } else {
+                console.log("user should at least add one new topic if new topic...");
+            }
+
+
+
+            });
+
+
+
+
+    };
+
+
+
+        // Query form process
+    $scope.submitQueryForm = function() {
 
 
 
@@ -315,6 +403,7 @@ angular.module('topicController', [])
 
                             $scope.documentCollection.push($scope.rawDocumentCollection[i]);
                             console.log($scope.documentCollection);
+                            $scope.documentCollection.empty = false;
 
 
                     } else {
@@ -362,107 +451,12 @@ angular.module('topicController', [])
         var route = '/dashboard/document/' + item._id.$oid;
         console.log(item._id.$oid);
 
-        // this is the redirection to the document-view, we also send the current topic
+        // this is the redirection to the document-view, we send the doc ID and the name of the current topic
         $location.path(route).search({paramA: $scope.myDropDown})
     };
 
-    $scope.newTopicTitle = $scope.myDropDown;
-
-    // Topic form process
-    $scope.submitTopicForm = function() {
-
-        $scope.oldTopicTitle = $scope.myDropDown;
-
-        console.log("Topic Form submitted ...");
-        console.log($scope.checkboxStatus.collab);
-        console.log($scope.checkboxStatus.active);
-        console.log($scope.newTopicTitle);
-        console.log($scope.oldTopicTitle);
-        console.log($scope.selectedTopic.querys);
-
-        var postOldTitle = $scope.oldTopicTitle;
-
-        if ($scope.newTopicTitle === undefined){
-            var postDataTitle = $scope.oldTopicTitle;
-        }
+    //$scope.newTopicTitle = $scope.myDropDown;
 
 
-        // only remember the new topic title if user has entered one
-        if ($scope.newTopicTitle != $scope.oldTopicTitle && $scope.newTopicTitle != undefined) {
-            postDataTitle = $scope.newTopicTitle
-        } else {
-            postDataTitle =  $scope.oldTopicTitle;
-        }
-
-        /*if (!$scope.selectedTopic.querys.length) {
-            var sentQuerys = $scope.selectedTopic.querys;
-        } else {
-            sentQuerys = null;
-        }*/
-
-        var postData;
-        postData = {
-            "topic.status": $scope.checkboxStatus.active,
-            "topic.collaboration": $scope.checkboxStatus.collab,
-            "topic.owner": userId,
-            "topic.title": postDataTitle,
-            "oldtopic.title": postOldTitle
-            //"topic.querys" : $scope.selectedTopic.querys // we send this with an extra call
-        };
-        console.log(postData);
-
-
-        // put comment on the server, WHEN FINISHED load data once more
-        $scope.newOrEditedTopic = new Api.UserbyIdTopic(postData);
-        $scope.newOrEditedTopic.$update({
-            id: userId
-        }).then(function() {
-
-            if ($scope.oldTopicTitle){
-
-                for (var i = 0, l = $scope.selectedTopic.querys.length; i < l; i++) {
-
-                var postDataQuerys = {
-                        "topic.title": postDataTitle,
-                        "query.id" : $scope.selectedTopic.querys[i].$oid
-
-                    };
-                console.log(postDataQuerys);
-
-                $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys);
-                $scope.alsoPushedQuerys.$update({
-                    id: userId
-                }).then(function () {
-                    console.log("RESET!!");
-                    // form should be resetted here ...
-
-                });
-
-            }
-
-            } else {
-                console.log("This is a new topic. No query is pushed to db.")
-                 console.log("RESET!!");
-            }
-
-            });
-
-
-
-
-    };
-
-
-
-        // Query form process
-    $scope.submitQueryForm = function() {
-
-
-
-        console.log("Query Form submitted ...");
-        console.log($scope.newQuery);
-
-
-    };
 });
 
