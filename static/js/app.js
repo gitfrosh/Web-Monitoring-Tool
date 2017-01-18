@@ -3,7 +3,7 @@
 // ///////////////////////////////////////////////Module
 
 var myApp = angular.module('myApp', [
-    'apiFactory', 'infiniteScroll','docController', 'testFactory', 'userController','topicController','ngRoute', 'ngResource', 'angular.filter'
+    'apiFactory', 'editTopicController', 'infiniteScroll','docController','startController','newTopicController','testFactory', 'userController','topicController','ngRoute', 'ngResource', 'angular.filter'
 ]);
 
 
@@ -30,13 +30,21 @@ myApp.config(['$routeProvider',
             redirectTo: '/dashboard/'
         }).
         when('/dashboard', {
-            // Show elements depending on user details:
-            // Does user have any topics saved?
-            // get uUser topics in array from DB
-            // show the first (if available), and fill in site elements
 
+            controller: 'StartCtrl',
+            templateUrl: '../static/partials/start.html',
+        }).
+        when('/dashboard/topic', {
             controller: 'TopicCtrl',
             templateUrl: '../static/partials/topic-view.html',
+        }).
+         when('/dashboard/newTopic', {
+            controller: 'NewTopicCtrl',
+            templateUrl: '../static/partials/new-topic.html',
+        }).
+         when('/dashboard/editTopic', {
+            controller: 'EditTopicCtrl',
+            templateUrl: '../static/partials/edit-topic.html',
         }).
         when('/dashboard/document/:itemId', {
             controller: 'DocumentCtrl',

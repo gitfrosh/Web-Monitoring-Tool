@@ -116,7 +116,7 @@ angular.module('docController', [])
 
         // this is the redirection to the topic-view, we don't need to reassign paramA (current topic) cause it's still
         // available through "search()"
-        $location.path('/dashboard/');//.search({paramA: paramA})
+        $location.path('/dashboard/topic');//.search({paramA: paramA})
 
     };
 
