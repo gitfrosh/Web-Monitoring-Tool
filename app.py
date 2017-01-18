@@ -63,7 +63,7 @@ restApi.add_resource(UserbyIdTopic, "/api/user/<string:userId>/topic")
 
 # POST
 # new query (when topic is created in user's data)
-restApi.add_resource(NewQuery, "/api/querys/")
+restApi.add_resource(NewQuery, "/api/querys")
 
 # GET
 restApi.add_resource(AllQuerys, "/api/querys/")
@@ -75,7 +75,7 @@ restApi.add_resource(Query, "/api/query/<string:queryId>")
 
 # PUT
 # update querys
-#restApi.add_resource(QuerybyIDStatus, "/api/query/<string:queryId>/newStatus") #todo
+restApi.add_resource(QuerybyIDStatus, "/api/query/<string:queryId>/newStatus")
 
 
 #################### document specific

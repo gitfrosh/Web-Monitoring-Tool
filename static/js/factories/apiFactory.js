@@ -46,6 +46,31 @@ angular.module('apiFactory', [])
                     id: '@id',
                     method: "GET"
                 }),
+            QuerybyIDStatus: $resource('/api/query/:id/newStatus', {}, {
+                update: {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8'
+                    },
+                    id: '@id'
+                        //data: Body of request is sent through Controller
+                }
+                }),
+
+            AllQuerys: $resource('/api/querys/', {
+                   method: "GET"
+                }),
+            NewQuery: $resource('/api/querys', {}, {
+                save: {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8'
+                    },
+                    id: '@id'
+                        //data: Body of request is sent through Controller
+                }
+                }),
+
             UserbyIdTopic: $resource('/api/user/:id/topic', {}, {
                 update: {
                     method: "PUT",
@@ -69,3 +94,5 @@ angular.module('apiFactory', [])
         };
     }
 ]);
+
+

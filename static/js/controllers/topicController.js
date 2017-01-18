@@ -231,27 +231,27 @@ angular.module('topicController', [])
             id: userId
         }).then(function() {
 
-            if ($scope.oldTopicTitle){
+            if ($scope.oldTopicTitle) {
 
                 for (var i = 0, l = $scope.selectedTopic.querys.length; i < l; i++) {
 
-                var postDataQuerys = {
+                    var postDataQuerys = {
                         "topic.title": postDataTitle,
-                        "query.id" : $scope.selectedTopic.querys[i].$oid
+                        "query.id": $scope.selectedTopic.querys[i].$oid
 
                     };
-                console.log(postDataQuerys);
+                    console.log(postDataQuerys);
 
-                $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys);
-                $scope.alsoPushedQuerys.$update({
-                    id: userId
-                }).then(function () {
-                    console.log("RESET!!");
-                    // form should be resetted here ...
+                    $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys);
+                    $scope.alsoPushedQuerys.$update({
+                        id: userId
+                    }).then(function () {
+                        console.log("RESET!!");
+                        // form should be resetted here ...
 
-                });
+                    });
 
-            }
+                }
 
             } else {
                 console.log("This is a new topic. No query is pushed to db.");
@@ -259,28 +259,161 @@ angular.module('topicController', [])
 
 
             }
-
+        });
             if ($scope.newQuery) {
 
-                // check first if query is already available
-
                 console.log("user entered: " + $scope.newQuery);
+                console.log($scope.queryObjects);
 
-                var postDataQuerys2 = {
-                        "topic.title": postDataTitle,
-                        "query.id" : $scope.newQuery
+                // check first if new Query has the same term as an existing query
+                var check = _.some($scope.queryObjects, function( el ) {
+                    return el.QUERY.term === $scope.newQuery;
+                    } );
 
-                    };
-                console.log(postDataQuerys2);
+                if (check) {
+                    console.log("This query already exists. Inform user and do nothing else."); //todo
+
+                } else {
+                    console.log("This query is not yet in user's data. Check if the query exists overall (for another " +
+                        "user)");
+
+                        var response1 = Api.AllQuerys.get({}, function() {
+                                    console.log("GET item from server....");
+                                    });
+
+                            response1.$promise.then(function(data) {
+                        $scope.allQuerys = data.QUERYS;
+                        console.log($scope.allQuerys);
+
+                            var check2 = _.some($scope.allQuerys, function( el ) {
+                            return el.term === $scope.newQuery;
+                             } );
+                            console.log(check2);
+
+                         if (check2) {
+                                console.log("This query exists on the server. We push the status for the user to True");
+
+                                // fetch the query from server to find out the ID of the query
+                                    $scope.newQueryfromServer = _.find($scope.allQuerys, function(item) {
+                                    return item.term === $scope.newQuery;
+                                            });
+
+                                 console.log($scope.newQueryfromServer);
+                                 console.log("newID: " + $scope.newQueryfromServer._id.$oid);
 
 
-                new Api.UserbyIDNewQuery(postDataQuerys2).$update({
-                    id: userId
-                }).then(function () {
-                    console.log("RESET!!");
-                    // form should be resetted here ...
+                             // change queryStatus for user in db
+                                var newQueryStatusData = {
+                                     "query.status": true,
+                                     "query.user" : userId
+                                         };
+
+
+                                $scope.newQueryStatus = new Api.QuerybyIDStatus(newQueryStatusData).$update({
+                                    id: $scope.newQueryfromServer._id.$oid
+                                        }).then(function () {
+                                        console.log("Neuer Status gesendet..");
+                                    });
+
+                                console.log("... and we push the the queryID onto  user's data!!! ");
+
+
+                                    var postDataQuerys2 = {
+                                            "topic.title": postDataTitle,
+                                            "query.id": $scope.newQueryfromServer._id.$oid
+
+                                        };
+                                     console.log(postDataQuerys2);
+
+
+                                  $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys2);
+                                         $scope.alsoPushedQuerys.$update({
+                                                id: userId
+                                            }).then(function () {
+                                                console.log("RESET!!");
+                                            // form should be resetted here ...
+
+                                     });
+
+
+
+                            } else {
+                             console.log("This query does not exist on the server at all. We have to push it there, set the"+
+                                    "the value for the user to TRUE and push it to the user's data.");
+
+
+                             // that's what the new query looks like, initiated with the first user-status
+                             var newQueryData = {
+                                     'status.active': true,
+                                     'status.user': userId,
+                                     'term': $scope.newQuery
+                                         };
+                             console.log(newQueryData);
+
+
+                             new Api.NewQuery(newQueryData).$save().then(function () {
+                                   console.log("Send Query to db!");
+
+
+
+                             // fetch the new ID ...
+
+                                var response = Api.AllQuerys.get({}, function() {
+                                    console.log("GET item from server....");
+                                    });
+
+                            response.$promise.then(function(data) {
+                                    $scope.allQuerys = data.QUERYS;
+                                    console.log($scope.allQuerys);
+
+
+
+                                 // fetch the query from server to find out the ID of the query
+                                    $scope.newQueryfromServer = _.find($scope.allQuerys, function(item) {
+                                    return item.term === $scope.newQuery;
+                                            });
+
+                                 console.log("newID: " + $scope.newQueryfromServer);
+                                console.log("newID: " + $scope.newQueryfromServer._id.$oid);
+
+                                  var updateQueryinTopic = {
+                                    "topic.title": postDataTitle,
+                                    "query.id" : $scope.newQueryfromServer._id.$oid
+
+                                 };
+                                console.log(updateQueryinTopic);
+
+                                new Api.UserbyIDNewQuery(updateQueryinTopic).$update({
+                                 id: userId
+                                    }).then(function () {
+                                   console.log("RESET!!");
+                                    // form should be resetted here ...
 
                 });
+                            }
+
+                            );
+
+
+
+                                       });
+
+
+
+
+
+
+
+
+                                             }});
+
+
+
+                                    }
+
+
+
+
 
             } else {
                 console.log("user should at least add one new topic if new topic...");
@@ -288,26 +421,7 @@ angular.module('topicController', [])
 
 
 
-            });
-
-
-
-
-    };
-
-
-
-        // Query form process
-    $scope.submitQueryForm = function() {
-
-
-
-    };
-
-
-
-
-
+            };
 
 
 

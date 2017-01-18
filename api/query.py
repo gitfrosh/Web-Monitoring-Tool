@@ -77,3 +77,30 @@ class AllQuerys(Resource):
         return json.loads(json_util.dumps({"QUERYS": data}))
 
 
+
+class QuerybyIDStatus(Resource):
+
+    def put(self, queryId):
+        from app import mongo
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('query.status', type=str, required=True, help='No query status given',
+                            location='json')
+        parser.add_argument('query.user', type=str, required=True, help='No user id given',
+                            location='json')
+        request_params = parser.parse_args()
+
+        result1 = mongo.db.querys.update({'_id': ObjectId(queryId)},
+                                        {'$pull': {'status': {'user': request_params['query.user']}}})
+
+        result2 = mongo.db.querys.update({'_id': ObjectId(queryId)}, {
+           '$push': {"status": {"user": ObjectId(request_params['query.user']), "active": request_params['query.status']}}}, upsert=True)
+
+        response = {
+            'result1': result1,
+            'result2': result2,
+            'error_code': 0
+        }
+
+        data_sanitized = json.loads(json_util.dumps(response))
+        return data_sanitized

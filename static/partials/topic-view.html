@@ -120,7 +120,7 @@
                 <div class="panel-heading" ng-if="addTopicStatus || editTopicStatus">Suchabfrage hinzufügen</div>
                 <div class="panel-body">
 
-                    <input ng-pattern="/^[a-zA-Z\s]*$/" required name="newTag" ng-model="newQuery" style="width:180px;max-width:180px;display:inline-block" type="text" class="form-control" id="newQuery">
+                    <input ng-pattern="/^[a-zA-Z\s]*$/" name="newTag" ng-model="newQuery" style="width:180px;max-width:180px;display:inline-block" type="text" class="form-control" id="newQuery">
 
                     <p class="alert alert-danger" ng-show="tagForm.newTag.$error.pattern"> <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Tags dürfen nur Buchstaben enthalten.</p>
 
