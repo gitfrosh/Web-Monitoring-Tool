@@ -183,3 +183,6 @@ angular.module('infiniteScroll', [])
         };
     }
 ]);
+
+angular.module('infiniteScroll')
+      .value('THROTTLE_MILLISECONDS', null);

@@ -8,6 +8,7 @@ angular.module('editTopicController', [])
 
     var userId = loggedInUser.userId;
     $scope.myDropDown = $location.search().paramA;
+    console.log($scope.myDropDown);
     $scope.selectedTopic = {};
     $scope.usertopictitles = [];
     $scope.usertopics = [];
@@ -15,7 +16,6 @@ angular.module('editTopicController', [])
     $scope.checkboxStatus = {};
     $scope.documentCollection = [];
 
-    console.log($scope.myDropDown);
 
 
             // also used i startController ---->>>> REDUNDANCE
@@ -25,6 +25,9 @@ angular.module('editTopicController', [])
              console.log("Load current user data and his topics ...");
              $scope.user = data;
              console.log($scope.user);
+
+
+    console.log($scope.myDropDown);
 
              // now give only the user's topics so that the dropdown menu can be initiated
              $scope.usertopics = data.USER.topics;
@@ -58,6 +61,8 @@ angular.module('editTopicController', [])
           } else {
               $scope.checkboxStatus.collab = false
           }
+
+
 
 
 
@@ -124,6 +129,7 @@ angular.module('editTopicController', [])
 
     };
 
+
      // THIS IS ALSO IN STARTCONTROLLER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             $scope.addTopic = function() {
@@ -144,11 +150,22 @@ angular.module('editTopicController', [])
         $location.path(route);
     };
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////DRRRRYYYYY
+
 
     // Topic form process
+
     $scope.submitTopicForm = function() {
 
-        // THIS FUNCTION IS MONSTROUS!!!!!
+                dbAction();
+
+            };
+
+    function dbAction() {
+
+
+
+                // THIS FUNCTION IS MONSTROUS!!!!!
 
         $scope.oldTopicTitle = $scope.myDropDown;
 
@@ -189,7 +206,7 @@ angular.module('editTopicController', [])
         console.log(postData);
 
 
-        // put topic on the server, WHEN FINISHED load data once more
+        // put topic in db, WHEN FINISHED load data once more
         $scope.newOrEditedTopic = new Api.UserbyIdTopic(postData);
         $scope.newOrEditedTopic.$update({
             id: userId
@@ -211,15 +228,22 @@ angular.module('editTopicController', [])
                         id: userId
                     }).then(function () {
                         console.log("RESET!!");
-                        // form should be resetted here ...
+
+                                //DRY//!!!!!!!!!!!!!!!!
+
+                                var paramA = postDataTitle;
+                                var route = '/dashboard/topic/';
+
+                                // this is the redirection to the edit-topic view, we send the topic name
+                                $location.path(route).search({paramA: paramA});
 
                     });
 
                 }
 
             } else {
-                console.log("This is a new topic. No query is pushed to db.");
-                console.log("User should now add the querys................");
+                console.log("No query is pushed to db.");
+
 
 
             }
@@ -295,7 +319,14 @@ angular.module('editTopicController', [])
                                                 id: userId
                                             }).then(function () {
                                                 console.log("RESET!!");
-                                            // form should be resetted here ...
+
+                                //DRY//!!!!!!!!!!!!!!!!
+
+                                var paramA = postDataTitle;
+                                var route = '/dashboard/editTopic/';
+
+                                // this is the redirection to the edit-topic view, we send the topic name
+                                $location.path(route).search({paramA: paramA});
 
                                      });
 
@@ -351,7 +382,14 @@ angular.module('editTopicController', [])
                                  id: userId
                                     }).then(function () {
                                    console.log("RESET!!");
-                                    // form should be resetted here ...
+
+                                 //DRY//!!!!!!!!!!!!!!!!
+
+                                var paramA = postDataTitle;
+                                var route = '/dashboard/editTopic/';
+
+                                // this is the redirection to the edit-topic view, we send the topic name
+                                $location.path(route).search({paramA: paramA});
 
                 });
                             }
@@ -382,10 +420,9 @@ angular.module('editTopicController', [])
             } else {
                 console.log("user should at least add one new topic if new topic...");
             }
+    }
 
 
-
-            };
 
 
     

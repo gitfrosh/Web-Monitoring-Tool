@@ -3,8 +3,10 @@
  */
 
 
-angular.module('topicController', [])
+angular.module('topicController', ['infiniteScroll'])
 .controller('TopicCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
+
+
 
     // this controller is actually too big and complex
 
@@ -98,20 +100,30 @@ angular.module('topicController', [])
 });
     }
 
-/*     $scope.selectAction = function() {
+     $scope.selectAction = function() {
+
+         // THIS IS ALSO IN STARTCONTROLLER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!DRY
 
          // actions to do on selected topic from Dropdown menu
 
         console.log("Lade Topic view with topic " + $scope.myDropDown);
 
-        $scope.addTopicStatus = false;
-        $scope.editTopicStatus = false;
-
-        loadQuerys();
+/*        $scope.addTopicStatus = false;
+        $scope.editTopicStatus = false;*/
 
 
+        var paramA = $scope.myDropDown;
+        var route = '/dashboard/topic/';
 
-    };*/
+
+        // this is the redirection to the topic-view, we send the name of the current topic
+        $location.path(route).search({paramA: $scope.myDropDown});
+
+
+        //loadQuerys();
+
+
+    };
 
     $scope.addTopic = function() {
         console.log("Clicked Add Topic!");
@@ -206,12 +218,28 @@ angular.module('topicController', [])
                 $scope.documentCollection = _.flatten($scope.documentCollection);
 
                 console.log($scope.documentCollection);
+
+                    $scope.items = $scope.documentCollection;
+
+                    // this is some stuff to handle the lazy load / infinite scroll
+            $scope.barLimit = 10;
+            $scope.increaseLimit = function() {
+            $scope.barLimit += 2;
+
+    };
+
+
+
             })
         }
 
         } else {
             console.log("There are no querys/documents that can be retrieved");
         }
+
+
+
+
 
 
     }
@@ -224,7 +252,7 @@ angular.module('topicController', [])
         // start a fresh documentCollection for our output table
         $scope.rawDocumentCollection = [];
         $scope.documentCollection = [];
-        $scope.documentCollection.empty = false;
+         $scope.documentCollection.empty = false;
 
 
         for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
@@ -257,18 +285,20 @@ angular.module('topicController', [])
 
                         if ($scope.rawDocumentCollection[i].bookmarks[a].b_user.$oid == userId && $scope.rawDocumentCollection[i].bookmarks[a].status == "True") {
 
-                        //console.log(rawDocumentCollection[i].bookmarks[a].b_user);
+                        console.log($scope.rawDocumentCollection[i].bookmarks[a].b_user.$oid);
+                        console.log($scope.rawDocumentCollection[i].bookmarks[a].status);
 
                             $scope.documentCollection.push($scope.rawDocumentCollection[i]);
+                            console.log($scope.rawDocumentCollection[i]);
                             console.log($scope.documentCollection);
                             $scope.documentCollection.empty = false;
 
 
                     } else {
-                            console.log("Es gibt keine markierten Dokumente in dieser Collection.");
-                            $scope.documentCollection.push({});
+                            console.log("Dieses Dokument hat keine Bookmarks.");
                             $scope.documentCollection.empty = true;
-                        }
+
+                     }
 
                     }
 
@@ -291,14 +321,6 @@ angular.module('topicController', [])
 
 
 
-    // this is some stuff to handle the lazy load / infinite scroll
-    $scope.barLimit = 5;
-    $scope.increaseLimit = function() {
-        $scope.barLimit += 5;
-        console.log('Increase Bar Limit', $scope.barLimit)
-    };
-
-
 
     // select item in table and pass it to the document-view (template)
     $scope.selectDocument = function(item) {
@@ -316,5 +338,8 @@ angular.module('topicController', [])
     //$scope.newTopicTitle = $scope.myDropDown;
 
 
+
+
 });
+
 

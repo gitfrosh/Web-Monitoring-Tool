@@ -3,7 +3,7 @@
 // ///////////////////////////////////////////////Module
 
 var myApp = angular.module('myApp', [
-    'apiFactory', 'editTopicController', 'infiniteScroll','docController','startController','newTopicController','testFactory', 'userController','topicController','ngRoute', 'ngResource', 'angular.filter'
+    'apiFactory', 'editTopicController','docController','startController','newTopicController','testFactory', 'userController','topicController','ngRoute', 'ngResource', 'angular.filter'
 ]);
 
 

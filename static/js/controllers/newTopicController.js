@@ -6,6 +6,26 @@
 angular.module('newTopicController', [])
 .controller('NewTopicCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
 
+    $scope.checkboxStatus = {};
+    $scope.checkboxStatus.active = false;
+    $scope.checkboxStatus.collab = false;
+
+    $scope.cancel = function() {
+
+        // DRY AGAIN!!!!!!!!!
+
+        console.log("Lade Dashboard neu");
+        var route = '/dashboard/';
+
+        // this is the redirection to dashboard
+        $location.path(route);
+
+    };
+
+
+
+
+
     var userId = loggedInUser.userId;
        // Topic form process
     $scope.submitTopicForm = function() {
@@ -68,122 +88,10 @@ angular.module('newTopicController', [])
         }).then(function() {
 
             console.log("This is a new topic. No query is pushed to db.");
-            console.log("User should now add the querys................");
+            console.log("User adds querys (required form field)");
+
 
                     });
-
-            if ($scope.newQuery) {
-
-
-                //***************************this monster is also in editTopic!! redundance!!
-                            // also used i startController ---->>>> REDUNDANCE
-         Api.User.get({
-        id: loggedInUser.userId
-     }, function(data) {
-             console.log("Load current user data and his topics ...");
-             $scope.user = data;
-             console.log($scope.user);
-
-             // now give only the user's topics so that the dropdown menu can be initiated
-             $scope.usertopics = data.USER.topics;
-             console.log($scope.usertopics);
-             console.log($scope.usertopictitles);
-
-             // put the topics' titles in an array
-             for (var i = 0, l = $scope.usertopics.length; i < l; i++) {
-                 $scope.usertopictitles.push($scope.usertopics[i].title);
-             }
-
-             console.log("Lade Topic view with topic " + $scope.myDropDown);
-
-             // fetch the topic object from server and store it in "selectedTopic"
-             $scope.selectedTopic = _.find($scope.usertopics, function (item) {
-                 return item.title === $scope.myDropDown;
-             });
-
-             console.log($scope.selectedTopic);
-
-             $scope.checkboxStatus = {};
-             $scope.editTopicStatus = true;
-             $scope.documentCollection = [];
-
-             if ($scope.selectedTopic.active == "True") {
-                 $scope.checkboxStatus.active = true
-             } else {
-                 $scope.checkboxStatus.active = false
-             }
-
-             if ($scope.selectedTopic.collaboration == "True") {
-                 $scope.checkboxStatus.collab = true
-             } else {
-                 $scope.checkboxStatus.collab = false
-             }
-
-
-             // bind IDs of querys ...
-             $scope.iDsOfquerysForSelectedTopic = $scope.selectedTopic.querys;
-
-             console.log($scope.selectedTopic.querys);
-
-             // now that we know the query IDs we must find the querys' objects (and the data; collab status, activeness
-             // status, suggestions, name, ...
-
-             $scope.queryObjects = [];
-
-             if ($scope.iDsOfquerysForSelectedTopic.length >= 1) {
-
-                 for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
-
-                     // get the query's names here...
-                     Api.QuerybyId.get({
-                         id: $scope.iDsOfquerysForSelectedTopic[i].$oid
-
-                     }, function (data) {
-                         $scope.rawData = data;
-
-                         // add outputs of more than one query to the collection
-                         $scope.queryObjects.push($scope.rawData);
-
-                         // flatten the array
-                         //$scope.documentCollection = _.flatten($scope.documentCollection);
-
-                         console.log($scope.queryObjects);
-                     })
-
-                 }
-
-             } else if (!$scope.iDsOfquerysForSelectedTopic.length) {
-                 console.log("There are no querys to retrieve.")
-             }
-             //*********************************************************************************
-
-
-         });
-
-
-
-
-
-                /////////// here begins the real stuff
-
-
-
-
-
-                console.log("user entered: " + $scope.newQuery);
-                console.log($scope.queryObjects);
-
-                // check first if new Query has the same term as an existing query
-                var check = _.some($scope.queryObjects, function( el ) {
-                    return el.QUERY.term === $scope.newQuery;
-                    } );
-
-                if (check) {
-                    console.log("This query already exists. Inform user and do nothing else."); //todo
-
-                } else {
-                    console.log("This query is not yet in user's data. Check if the query exists overall (for another " +
-                        "user)");
 
                         var response1 = Api.AllQuerys.get({}, function() {
                                     console.log("GET item from server....");
@@ -239,7 +147,18 @@ angular.module('newTopicController', [])
                                                 id: userId
                                             }).then(function () {
                                                 console.log("RESET!!");
-                                            // form should be resetted here ...
+
+
+                                // inform user that he can add more querys! //todo
+
+                                 //DRY//!!!!!!!!!!!!!!!!
+
+                                var paramA = $scope.newTopicTitle;
+                                var route = '/dashboard/editTopic/';
+
+                                // this is the redirection to the edit-topic view, we send the topic name
+                                $location.path(route).search({paramA: paramA});
+
 
                                      });
 
@@ -295,7 +214,15 @@ angular.module('newTopicController', [])
                                  id: userId
                                     }).then(function () {
                                    console.log("RESET!!");
-                                    // form should be resetted here ...
+                                 // inform user that he can add more querys! //todo
+
+
+                                //DRY//!!!!!!!!!!!!!!!!
+                                var paramA = $scope.newTopicTitle;
+                                var route = '/dashboard/editTopic/';
+
+                                // this is the redirection to the edit-topic view, we send the topic name
+                                $location.path(route).search({paramA: paramA});
 
                 });
                             }
@@ -316,16 +243,6 @@ angular.module('newTopicController', [])
                                              }});
 
 
-
-                                    }
-
-
-
-
-
-            } else {
-                console.log("user should at least add one new topic if new topic...");
-            }
 
 
 
