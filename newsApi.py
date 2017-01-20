@@ -2,6 +2,7 @@ import json
 from celery import Celery
 import requests
 from flask import Flask
+from time import sleep
 
 def requestNewsAPI():
     # set up API integration here
@@ -22,4 +23,5 @@ def requestNewsAPI():
 
         requests.status_code = "Connection refused"
 
-    return
+    sleep(10)
+    print("Task #1 is done!")
