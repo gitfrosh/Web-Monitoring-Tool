@@ -22,29 +22,10 @@ angular.module('topicController', ['infiniteScroll'])
     $scope.selectedTopic = {};
     $scope.selectedTopic.querys = [];
     $scope.documentCollection = [];
-    //$scope.myDropDown = ""; // default value of Dropdown: empty space for now
-
-    // Get all users // we never need this
-    //Api.User.query(function(data) {
-    //    $scope.users = data.users;
-    //});
-
-    // Our form data for creating a new User with ng-model  //  this is low-priority
-    //$scope.postData = {};
-    //$scope.newUser = function() {
-    //    var user = new Api.User($scope.postData);
-    //    user.$save();
-    //};
-
-    // Get specific User with the following Id ... (hardcoded for now, see constant!!)
-    // and save his topics (usertopics)
-    // and save his usertopictitles (usertopictitles)
-
-    // when the Topic-view is loaded, get the user data first
+    $scope.documentCollection.empty = false;
 
 
     initiateView();
-
 
 
     function loadQuerys() {
@@ -226,6 +207,8 @@ angular.module('topicController', ['infiniteScroll'])
             $scope.increaseLimit = function() {
             $scope.barLimit += 2;
 
+                $scope.documentCollection.empty = false;
+
     };
 
 
@@ -235,6 +218,7 @@ angular.module('topicController', ['infiniteScroll'])
 
         } else {
             console.log("There are no querys/documents that can be retrieved");
+            $scope.documentCollection.empty = false;
         }
 
 
@@ -296,7 +280,7 @@ angular.module('topicController', ['infiniteScroll'])
 
                     } else {
                             console.log("Dieses Dokument hat keine Bookmarks.");
-                            $scope.documentCollection.empty = true;
+                            //$scope.documentCollection.empty = true; does not really work //todo
 
                      }
 

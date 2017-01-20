@@ -10,9 +10,40 @@ angular.module('newTopicController', [])
     $scope.checkboxStatus.active = false;
     $scope.checkboxStatus.collab = false;
 
+
+
+////////////////***************************************************************************Modal Stuff
+
+    $scope.showModal2 = false;
+
+    $scope.hide = function(m){
+            $scope.showModal2 = false;
+            redirect()
+    };
+
+    //////////////////////***
+
+    function redirect() {
+
+        var paramA = $scope.newTopicTitle;
+        var route = '/dashboard/editTopic/';
+
+        // this is the redirection to the edit-topic view, we send the topic name
+        $location.path(route).search({paramA: paramA});
+
+    }
+
+
+
+
+
+
+
     $scope.cancel = function() {
 
         // DRY AGAIN!!!!!!!!!
+
+        // evtl. Dialogbox...
 
         console.log("Lade Dashboard neu");
         var route = '/dashboard/';
@@ -152,12 +183,8 @@ angular.module('newTopicController', [])
                                 // inform user that he can add more querys! //todo
 
                                  //DRY//!!!!!!!!!!!!!!!!
-
-                                var paramA = $scope.newTopicTitle;
-                                var route = '/dashboard/editTopic/';
-
-                                // this is the redirection to the edit-topic view, we send the topic name
-                                $location.path(route).search({paramA: paramA});
+                                $scope.showModal2 = true;
+                        
 
 
                                      });
@@ -216,13 +243,12 @@ angular.module('newTopicController', [])
                                    console.log("RESET!!");
                                  // inform user that he can add more querys! //todo
 
+                                    
+                                 //DRY//!!!!!!!!!!!!!!!!
+                                $scope.showModal2 = true;
+                   
 
-                                //DRY//!!!!!!!!!!!!!!!!
-                                var paramA = $scope.newTopicTitle;
-                                var route = '/dashboard/editTopic/';
 
-                                // this is the redirection to the edit-topic view, we send the topic name
-                                $location.path(route).search({paramA: paramA});
 
                 });
                             }

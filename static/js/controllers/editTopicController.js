@@ -9,13 +9,60 @@ angular.module('editTopicController', [])
     var userId = loggedInUser.userId;
     $scope.myDropDown = $location.search().paramA;
     console.log($scope.myDropDown);
-    $scope.selectedTopic = {};
+    //$scope.selectedTopic = {};
     $scope.usertopictitles = [];
     $scope.usertopics = [];
-    $scope.selectedTopic.querys = [];
+    //$scope.selectedTopic.querys = [];
     $scope.checkboxStatus = {};
     $scope.documentCollection = [];
 
+
+
+    ////////////////***************************************************************************Modal Stuff
+
+    $scope.showModal1 = false;
+    $scope.showModal3 = false; // distinction between only query updated and everything else???
+    $scope.showModal4 = false;
+
+         $scope.hide = function(m, postDataTitle){
+        if(m === 1){
+            $scope.showModal1 = false;
+        }else if (m === 3) {
+            $scope.showModal3 = false;
+            redirectToTopic(postDataTitle)
+        } else {
+            $scope.showModal4 = false;
+            redirectToEditTopic(postDataTitle)
+        }
+    };
+
+
+    //////////////////////***
+
+    function redirectToTopic(postDataTitle) {
+
+    //DRY//!!!!!!!!!!!!!!!!
+
+   var paramA = postDataTitle;
+   var route = '/dashboard/topic/';
+
+   // this is the redirection to the edit-topic view, we send the topic name
+   $location.path(route).search({paramA: paramA});
+
+    }
+
+
+    function redirectToEditTopic(postDataTitle) {
+
+    //DRY//!!!!!!!!!!!!!!!!
+
+   var paramA = postDataTitle;
+   var route = '/dashboard/editTopic/';
+
+   // this is the redirection to the edit-topic view, we send the topic name
+   $location.path(route).search({paramA: paramA});
+
+    }
 
 
             // also used i startController ---->>>> REDUNDANCE
@@ -32,12 +79,6 @@ angular.module('editTopicController', [])
              // now give only the user's topics so that the dropdown menu can be initiated
              $scope.usertopics = data.USER.topics;
              console.log($scope.usertopics);
-             console.log($scope.usertopictitles);
-
-             // put the topics' titles in an array
-             for (var i = 0, l = $scope.usertopics.length; i < l; i++) {
-                 $scope.usertopictitles.push($scope.usertopics[i].title);
-             }
 
                 console.log("Lade Topic view with topic " + $scope.myDropDown);
 
@@ -175,22 +216,22 @@ angular.module('editTopicController', [])
         console.log($scope.checkboxStatus.active);
         console.log($scope.newTopicTitle);
         console.log($scope.oldTopicTitle);
-        console.log($scope.selectedTopic.querys);
+        //console.log($scope.selectedTopic.querys);
 
 
 
         var postOldTitle = $scope.oldTopicTitle;
 
         if ($scope.newTopicTitle === undefined){
-            var postDataTitle = $scope.oldTopicTitle;
+            $scope.postDataTitle = $scope.oldTopicTitle;
         }
 
 
         // only remember the new topic title if user has entered one
         if ($scope.newTopicTitle != $scope.oldTopicTitle && $scope.newTopicTitle != undefined) {
-            postDataTitle = $scope.newTopicTitle
+            $scope.postDataTitle = $scope.newTopicTitle
         } else {
-            postDataTitle =  $scope.oldTopicTitle;
+            $scope.postDataTitle =  $scope.oldTopicTitle;
         }
 
 
@@ -199,56 +240,13 @@ angular.module('editTopicController', [])
             "topic.status": $scope.checkboxStatus.active,
             "topic.collaboration": $scope.checkboxStatus.collab,
             "topic.owner": userId,
-            "topic.title": postDataTitle,
+            "topic.title": $scope.postDataTitle,
             "oldtopic.title": postOldTitle
             //"topic.querys" : $scope.selectedTopic.querys // we send this with an extra call
         };
         console.log(postData);
 
-
-        // put topic in db, WHEN FINISHED load data once more
-        $scope.newOrEditedTopic = new Api.UserbyIdTopic(postData);
-        $scope.newOrEditedTopic.$update({
-            id: userId
-        }).then(function() {
-
-            if ($scope.oldTopicTitle) {
-
-                for (var i = 0, l = $scope.selectedTopic.querys.length; i < l; i++) {
-
-                    var postDataQuerys = {
-                        "topic.title": postDataTitle,
-                        "query.id": $scope.selectedTopic.querys[i].$oid
-
-                    };
-                    console.log(postDataQuerys);
-
-                    $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys);
-                    $scope.alsoPushedQuerys.$update({
-                        id: userId
-                    }).then(function () {
-                        console.log("RESET!!");
-
-                                //DRY//!!!!!!!!!!!!!!!!
-
-                                var paramA = postDataTitle;
-                                var route = '/dashboard/topic/';
-
-                                // this is the redirection to the edit-topic view, we send the topic name
-                                $location.path(route).search({paramA: paramA});
-
-                    });
-
-                }
-
-            } else {
-                console.log("No query is pushed to db.");
-
-
-
-            }
-        });
-            if ($scope.newQuery) {
+        if ($scope.newQuery) {
 
                 console.log("user entered: " + $scope.newQuery);
                 console.log($scope.queryObjects);
@@ -259,7 +257,11 @@ angular.module('editTopicController', [])
                     } );
 
                 if (check) {
-                    console.log("This query already exists. Inform user and do nothing else."); //todo
+                    console.log("This query already exists. Inform user and do nothing else."); 
+                    $scope.showModal1 = true;
+                    console.log($scope.showModal1);
+                    return
+
 
                 } else {
                     console.log("This query is not yet in user's data. Check if the query exists overall (for another " +
@@ -320,13 +322,11 @@ angular.module('editTopicController', [])
                                             }).then(function () {
                                                 console.log("RESET!!");
 
-                                //DRY//!!!!!!!!!!!!!!!!
-
-                                var paramA = postDataTitle;
-                                var route = '/dashboard/editTopic/';
-
-                                // this is the redirection to the edit-topic view, we send the topic name
-                                $location.path(route).search({paramA: paramA});
+                                  //DRY//!!!!!!!!!!!!!!!!
+                                $scope.showModal3 = true;
+                                console.log($scope.showModal3);
+                                
+                                //$scope.showModal3 = true;
 
                                      });
 
@@ -372,7 +372,7 @@ angular.module('editTopicController', [])
                                 console.log("newID: " + $scope.newQueryfromServer._id.$oid);
 
                                   var updateQueryinTopic = {
-                                    "topic.title": postDataTitle,
+                                    "topic.title": $scope.postDataTitle,
                                     "query.id" : $scope.newQueryfromServer._id.$oid
 
                                  };
@@ -384,12 +384,10 @@ angular.module('editTopicController', [])
                                    console.log("RESET!!");
 
                                  //DRY//!!!!!!!!!!!!!!!!
-
-                                var paramA = postDataTitle;
-                                var route = '/dashboard/editTopic/';
-
-                                // this is the redirection to the edit-topic view, we send the topic name
-                                $location.path(route).search({paramA: paramA});
+                                console.log($scope.postDataTitle);
+                                 //DRY//!!!!!!!!!!!!!!!!
+                                $scope.showModal3 = true;
+                                console.log($scope.showModal3);
 
                 });
                             }
@@ -418,12 +416,57 @@ angular.module('editTopicController', [])
 
 
             } else {
-                console.log("user should at least add one new topic if new topic...");
+                console.log("this case actually cannot happen.");
+
             }
+
+
+        // put topic in db, WHEN FINISHED load data once more
+        $scope.newOrEditedTopic = new Api.UserbyIdTopic(postData);
+        $scope.newOrEditedTopic.$update({
+            id: userId
+        }).then(function() {
+
+            if ($scope.oldTopicTitle) {
+
+                for (var i = 0, l = $scope.selectedTopic.querys.length; i < l; i++) {
+
+                    var postDataQuerys = {
+                        "topic.title": $scope.postDataTitle,
+                        "query.id": $scope.selectedTopic.querys[i].$oid
+
+                    };
+                    console.log(postDataQuerys);
+
+                    $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys);
+                    $scope.alsoPushedQuerys.$update({
+                        id: userId
+                    }).then(function () {
+                        console.log("RESET!!");
+
+                                //DRY//!!!!!!!!!!!!!!!!
+                        console.log($scope.postDataTitle);
+
+                          //DRY//!!!!!!!!!!!!!!!!
+                                $scope.showModal3 = true;
+                                console.log($scope.showModal3);
+                    });
+
+                }
+
+            } else {
+                console.log("No query is pushed to db.");
+
+
+
+            }
+
+        });
+
     }
 
 
 
 
-    
+
 });

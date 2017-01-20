@@ -2,6 +2,7 @@
 Web Monitoring Tool Costum Styles
 */
 
+
 html, body {
     max-width: 100%;
 
@@ -89,7 +90,7 @@ h3, h4 {
 }
 
 .large {
-	font-size: 2em;
+	font-size: 1.5em;
 }
 
 .text-muted {

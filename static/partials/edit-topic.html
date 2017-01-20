@@ -1,5 +1,38 @@
+        <modal visible="showModal1" on-sown="modalOneShown()" on-hide="modalOneHide()">
+            <modal-header title=""></modal-header>
+            <modal-body>
+                 Die Suchanfrage ist für dieses Thema bereits vorhanden. Bitte wählen Sie eine andere Suchanfrage.
+            </modal-body>
+            <modal-footer>
+                <button class="btn btn-primary"  ng-click="hide(1)">Zurück</button>
+            </modal-footer>
+        </modal>
+
+        <modal visible="showModal3" on-sown="modalOneShown()" on-hide="modalOneHide()">
+            <modal-header-success title=""></modal-header-success>
+            <modal-body>
+                 Das Thema "{{postDataTitle}}" wurde erfolgreich geändert.
+            </modal-body>
+            <modal-footer>
+                <button class="btn btn-primary"  ng-click="hide(3, postDataTitle)">Weiter</button>
+            </modal-footer>
+        </modal>
+
+        <modal visible="showModal4" on-sown="modalOneShown()" on-hide="modalOneHide()">
+            <modal-header-success title=""></modal-header-success>
+            <modal-body>
+                 Die neue Suchanfrage für das Thema "{{postDataTitle}}" wurde erfolgreich hinzugefügt.
+            </modal-body>
+            <modal-footer>
+                <button class="btn btn-primary"  ng-click="hide(4, postDataTitle)">Weiter</button>
+            </modal-footer>
+        </modal>
+
+
+
 <form role="form" name="topicForm" ng-submit="submitTopicForm()">
 <div class="area">
+
 
 
     <div class="row">
@@ -24,7 +57,7 @@
 
                         <select name="pickTopic" id="pickTopic" ng-change="selectAction()" ng-model="myDropDown" class="form-control">
 
-                            <option ng-repeat="i in usertopictitles track by $index" value="{{i}}">{{i}}</option>
+                            <option ng-repeat="i in usertopics track by $index" value="{{i.title}}">{{i.title}}</option>
 
                         </select>
                     </div>

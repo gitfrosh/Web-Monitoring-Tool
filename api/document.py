@@ -4,6 +4,7 @@ from flask_restful import reqparse, abort, Api, Resource
 from bson import json_util, ObjectId
 import json
 
+
 #CRUD Operations:
 #Create (POST) - Make something
 #Read (GET)_- Get something
@@ -140,3 +141,51 @@ class DocumentbyIDSource(Resource):
 
     def put(self):
         return
+
+
+class NewDocument(Resource):
+
+    def post(self):
+        from app import mongo
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('title', type=str, required=True, help='No title given',
+                            location='json')
+        parser.add_argument('description', type=str, required=False, help='No abstract given',
+                            location='json')
+        parser.add_argument('publishedAt', type=str, required=True, help='No publishedAt given',
+                            location='json')
+        parser.add_argument('url', type=str, required=True, help='No user given',
+                            location='json') # maybe later
+        request_params = parser.parse_args()
+        ###result = process_the_request(request_params)
+
+        #dmongo.db.documents.insert_many([{'i': i} for i in range(10000)]).inserted_ids
+
+        # for i in dict(parser):
+
+        result = mongo.db.documents.insert({
+            "abstract": request_params['description'],
+            "bookmarks": [],
+            "comments": [],
+            "date": request_params['publishedAt'],
+            "querys": [],
+            "related_docs": [],
+            "sources": {
+                "quellenab": [],
+                "quellenunab": False
+            },
+            "super_doc": "",
+            "tags_system": [],
+            "tags_user": [],
+            "title": request_params['title'],
+            "url": request_params['url']
+        })
+
+        response = {
+            'result': result,
+            'error_code': 0
+        }
+
+        data_sanitized = json.loads(json_util.dumps(response))
+        return data_sanitized
