@@ -151,7 +151,7 @@ class NewDocument(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('title', type=str, required=True, help='No title given',
                             location='json')
-        parser.add_argument('description', type=str, required=False, help='No abstract given',
+        parser.add_argument('abstract', type=str, required=False, help='No abstract given',
                             location='json')
         parser.add_argument('publishedAt', type=str, required=True, help='No publishedAt given',
                             location='json')
@@ -165,7 +165,7 @@ class NewDocument(Resource):
         # for i in dict(parser):
 
         result = mongo.db.documents.insert({
-            "abstract": request_params['description'],
+            "abstract": request_params['abstract'],
             "bookmarks": [],
             "comments": [],
             "date": request_params['publishedAt'],

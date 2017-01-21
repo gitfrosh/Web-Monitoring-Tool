@@ -1,21 +1,30 @@
-"""Lorem ipsum
-"""
-import executor as executor
-import requests
-from flask import Flask, render_template, request, url_for
-from flask_pymongo import PyMongo
-from flask_restful import reqparse, abort, Api, Resource
-from celery import Celery
-import newsApi
-from api.document import *
-from api.user import *
-from api.query import *
-from time import sleep, time
-from time import sleep
+"""This is where all the magic starts. We initiate the db connection, the flask microframework for web applications
+in python, we set up basic routing to realize login, dashboard, errorhandling (404) and set up the scheduling and
+threading of tasks that are executed by the flask server application.
+
+The backend is all python! The frontend is completely standalone AngularJS. AngularJS components are served only in
+the static folders js (app.js, controllers, directives,..) and partials for the view. Backend and Frontend communicate
+via REST. Like that, any component can be substituted.
+
+Communicating via RESTful APIs is essential: we set up an own REST API ("myRestAPI") which handles all incoming CRUD
+requests from the frontend and moves them on to the MongoDB.
+
+Additionally we need to talk to external APIs where we fetch the actual documents. This is realized through "newsApi.py"
+and the PreProcessor."""
+
 from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
-import schedule
+from time import sleep
 
+import executor as executor
+import schedule
+from flask import Flask, render_template
+from flask_pymongo import PyMongo
+
+import newsApi
+from api.document import *
+from api.query import *
+from api.user import *
 
 app = Flask(__name__)
 
@@ -59,9 +68,11 @@ def page_not_found(e):
 # --> apiIntegration
 
 # periodic task
-def run_every_1000_seconds():
+def run_every_10_seconds():
     print("Start periodic task!")
-    executor.submit(newsApi.requestNewsAPI())
+    executor.submit(newsApi.collectDocuments)
+   # executor.submit(newsApi.fetchQuerys())
+    #executor.submit(newsApi.requestNewsAPI())
 
 # schedule operation
 def run_schedule():
@@ -143,7 +154,7 @@ myRestApi.add_resource(DocumentbyIDSource, "/api/document/<string:documentId>/ne
 if __name__ == "__main__":
 
 
-    schedule.every(1000).seconds.do(run_every_1000_seconds)
+    schedule.every(10).seconds.do(run_every_10_seconds)
     t = Thread(target=run_schedule)
     t.start()
     app.run(host='0.0.0.0',use_reloader=False, debug=True, threaded=True)
