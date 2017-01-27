@@ -3,8 +3,7 @@
  */
 
 
-angular.module('newTopicController', [])
-.controller('NewTopicCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
+myApp.controller('NewTopicCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
 
     $scope.checkboxStatus = {};
     $scope.checkboxStatus.active = false;

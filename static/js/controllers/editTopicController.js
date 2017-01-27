@@ -3,8 +3,8 @@
  */
 
 
-angular.module('editTopicController', [])
-.controller('EditTopicCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
+
+myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestFactory, $location, loggedInUser) {
 
     var userId = loggedInUser.userId;
     $scope.myDropDown = $location.search().paramA;
@@ -35,13 +35,26 @@ angular.module('editTopicController', [])
             redirectToEditTopic(postDataTitle)
         }
     };
+    
+
+
+    $scope.cancelEdit = function () {
+            $scope.showModal1 = false;
+    $scope.showModal3 = false; // distinction between only query updated and everything else???
+    $scope.showModal4 = false;
+   var paramA = $scope.myDropDown;
+   var route = '/dashboard/topic/';
+
+   // this is the redirection to the edit-topic view, we send the topic name
+   $location.path(route).search({paramA: paramA});
+
+    };
+
 
 
     //////////////////////***
 
     function redirectToTopic(postDataTitle) {
-
-    //DRY//!!!!!!!!!!!!!!!!
 
    var paramA = postDataTitle;
    var route = '/dashboard/topic/';
@@ -51,69 +64,12 @@ angular.module('editTopicController', [])
 
     }
 
+   function loadQuerys() {
 
-    function redirectToEditTopic(postDataTitle) {
-
-    //DRY//!!!!!!!!!!!!!!!!
-
-   var paramA = postDataTitle;
-   var route = '/dashboard/editTopic/';
-
-   // this is the redirection to the edit-topic view, we send the topic name
-   $location.path(route).search({paramA: paramA});
-
-    }
+           /////////////!!!DRY!!! also in editTopic/////////////////////////////////////////////////////////////////////
 
 
-            // also used i startController ---->>>> REDUNDANCE
-         Api.User.get({
-        id: loggedInUser.userId
-     }, function(data) {
-             console.log("Load current user data and his topics ...");
-             $scope.user = data;
-             console.log($scope.user);
-
-
-    console.log($scope.myDropDown);
-
-             // now give only the user's topics so that the dropdown menu can be initiated
-             $scope.usertopics = data.USER.topics;
-             console.log($scope.usertopics);
-
-                console.log("Lade Topic view with topic " + $scope.myDropDown);
-
-            // fetch the topic object from server and store it in "selectedTopic"
-            $scope.selectedTopic = _.find($scope.usertopics, function(item) {
-            return item.title === $scope.myDropDown;
-        });
-
-    console.log($scope.selectedTopic);
-
-
-
-          if ($scope.selectedTopic.active == "True"){
-               $scope.checkboxStatus.active = true
-          } else {
-              $scope.checkboxStatus.active = false
-          }
-
-          if ($scope.selectedTopic.collaboration == "True"){
-               $scope.checkboxStatus.collab = true
-          } else {
-              $scope.checkboxStatus.collab = false
-          }
-
-
-
-
-
-        // bind IDs of querys ...
-        $scope.iDsOfquerysForSelectedTopic = $scope.selectedTopic.querys;
-
-        console.log($scope.selectedTopic.querys);
-
-         // now that we know the query IDs we must find the querys' objects (and the data; collab status, activeness
-          // status, suggestions, name, ...
+         // now that we know the query IDs we must find the querys' objects
 
           $scope.queryObjects = [];
 
@@ -131,9 +87,6 @@ angular.module('editTopicController', [])
                   // add outputs of more than one query to the collection
                   $scope.queryObjects.push($scope.rawData);
 
-                  // flatten the array
-                  //$scope.documentCollection = _.flatten($scope.documentCollection);
-
                   console.log($scope.queryObjects);
               })
 
@@ -142,56 +95,51 @@ angular.module('editTopicController', [])
           } else if (!$scope.iDsOfquerysForSelectedTopic.length) {
               console.log("There are no querys to retrieve.")
           }
+
+
+    }
+
+
+
+
+    function redirectToEditTopic(postDataTitle) {
+
+   var paramA = postDataTitle;
+   var route = '/dashboard/editTopic/';
+
+   // this is the redirection to the edit-topic view, we send the topic name
+   $location.path(route).search({paramA: paramA});
+
+    }
+    
+    
+            // also used i startController ---->>>> REDUNDANCE
+         Api.User.get({
+        id: loggedInUser.userId
+     }, function(data) {
+        console.log("Load current user data and his topics ...");
+        $scope.user = data;
+
+        UserObjectFactory.setUserObject($scope.user);
+        $scope.usertopics = UserObjectFactory.getTopics();
+        $scope.usertopictitles = UserObjectFactory.getTopicTitles();
+             
+         console.log("Lade Topic view with topic " + $scope.myDropDown); // on first initiate this is empty!
+
+         UserObjectFactory.setDropdown($scope.myDropDown);
+         $scope.selectedTopic = UserObjectFactory.getselTopic();
+         $scope.iDsOfquerysForSelectedTopic = UserObjectFactory.getSelTopicQuerys();
+             
+         $scope.checkboxStatus.active = $scope.selectedTopic.active == "True";
+         $scope.checkboxStatus.collab = $scope.selectedTopic.collaboration == "True";
+
+
+         // now that we know the query IDs we must find the querys' objects
+          loadQuerys();
+
+
 });
 
-
-     $scope.selectAction = function() {
-
-         // THIS IS ALSO IN STARTCONTROLLER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-         // actions to do on selected topic from Dropdown menu
-
-        console.log("Lade Topic view with topic " + $scope.myDropDown);
-
-/*        $scope.addTopicStatus = false;
-        $scope.editTopicStatus = false;*/
-
-
-        var paramA = $scope.myDropDown;
-        var route = '/dashboard/topic/';
-
-
-        // this is the redirection to the topic-view, we send the name of the current topic
-        $location.path(route).search({paramA: $scope.myDropDown});
-
-
-        //loadQuerys();
-
-
-    };
-
-
-     // THIS IS ALSO IN STARTCONTROLLER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-            $scope.addTopic = function() {
-        console.log("Clicked Add Topic!");
-        // set variables to null, to modificate the view
-
-           /* $scope.addTopicStatus = true;
-            $scope.documentCollection = [];
-            $scope.myDropDown = "";
-            $scope.selectedTopic = {};
-            $scope.iDsOfquerysForSelectedTopic = {};
-            $scope.oldTopicTitle = "";*/
-
-        var route = '/dashboard/newtopic/';
-
-
-        // this is the redirection to the new-topic-form
-        $location.path(route);
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////DRRRRYYYYY
 
 
     // Topic form process

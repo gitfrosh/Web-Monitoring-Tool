@@ -18,7 +18,7 @@ angular.module('testFactory', [])
         getQueryObject: function ($scope) {
 
             console.log(_queryId);
-             // get the query's names here...
+
               Api.QuerybyId.get({
                   id: _queryId
 

@@ -3,10 +3,8 @@
  */
 
 
-angular.module('topicController', ['infiniteScroll'])
-.controller('TopicCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
 
-
+myApp.controller('TopicCtrl', function($scope, Api, QueryObjectFactory, UserObjectFactory, TestFactory, $location, loggedInUser) {
 
     // this controller is actually too big and complex
 
@@ -28,34 +26,13 @@ angular.module('topicController', ['infiniteScroll'])
     initiateView();
 
 
-    function loadQuerys() {
-
-        if ($scope.myDropDown) { // if a topic was selected...
-            console.log("Lade Topic view with topic " + $scope.myDropDown);
-
-            // fetch the topic object from server and store it in "selectedTopic"
-            $scope.selectedTopic = _.find($scope.usertopics, function(item) {
-            return item.title === $scope.myDropDown;
-        });
-
-        // bind IDs of querys ...
-        $scope.iDsOfquerysForSelectedTopic = $scope.selectedTopic.querys;
-
-        console.log($scope.selectedTopic.querys);
-
-
-        loadTable(); // ... load table
-
-        } else { //... else do nothing
-            console.log("No topic selected");
-
-        }
-    }
-
-
-
-
     function initiateView() {
+
+        $scope.usertopics = [];
+    $scope.usertopictitles = [];
+         $scope.selectedTopic = {};
+    $scope.selectedTopic.querys = [];
+
 
         // also used i startController ---->>>> REDUNDANCE
          Api.User.get({
@@ -63,69 +40,31 @@ angular.module('topicController', ['infiniteScroll'])
      }, function(data) {
         console.log("Load current user data and his topics ...");
         $scope.user = data;
-        console.log($scope.user);
 
-        // now give only the user's topics so that the dropdown menu can be initiated
-        $scope.usertopics = data.USER.topics;
-        console.log($scope.usertopics);
-        console.log($scope.usertopictitles);
+        UserObjectFactory.setUserObject($scope.user);
+        $scope.usertopics = UserObjectFactory.getTopics();
+        $scope.usertopictitles = UserObjectFactory.getTopicTitles();
 
-         // put the topics' titles in an array
-        for (var i = 0, l = $scope.usertopics.length; i < l; i++) {
-            $scope.usertopictitles.push($scope.usertopics[i].title);
+
+        if ($scope.myDropDown) { // if a topic was selected...
+            console.log("Lade Topic view with topic " + $scope.myDropDown); // on first initiate this is empty!
+
+            UserObjectFactory.setDropdown($scope.myDropDown);
+            $scope.selectedTopic = UserObjectFactory.getselTopic();
+            $scope.iDsOfquerysForSelectedTopic = UserObjectFactory.getSelTopicQuerys();
+
+            loadTable(); // ... load table
+            loadQuerys()
+
+        } else { //... else do nothing
+            console.log("No topic selected");
+
         }
+             });
 
-        console.log("Lade Topic view with topic " + $scope.myDropDown); // on first initiate this is empty!
-
-         loadQuerys();
-});
     }
 
-     $scope.selectAction = function() {
-
-         // THIS IS ALSO IN STARTCONTROLLER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!DRY
-
-         // actions to do on selected topic from Dropdown menu
-
-        console.log("Lade Topic view with topic " + $scope.myDropDown);
-
-/*        $scope.addTopicStatus = false;
-        $scope.editTopicStatus = false;*/
-
-
-        var paramA = $scope.myDropDown;
-        var route = '/dashboard/topic/';
-
-
-        // this is the redirection to the topic-view, we send the name of the current topic
-        $location.path(route).search({paramA: $scope.myDropDown});
-
-
-        //loadQuerys();
-
-
-    };
-
-    $scope.addTopic = function() {
-        console.log("Clicked Add Topic!");
-        // set variables to null, to modificate the view
-
-            $scope.addTopicStatus = true;
-            $scope.documentCollection = [];
-            $scope.myDropDown = "";
-            $scope.selectedTopic = {};
-            $scope.iDsOfquerysForSelectedTopic = {};
-            $scope.oldTopicTitle = "";
-
-
-        var route = '/dashboard/newTopic/';
-
-        // this is the redirection to the edit-topic view, we send the topic name
-        $location.path(route);
-
-
-
-    };
+   
 
 
       $scope.editTopic = function() {
@@ -136,17 +75,8 @@ angular.module('topicController', ['infiniteScroll'])
           $scope.editTopicStatus = true;
           $scope.documentCollection = [];
 
-          if ($scope.selectedTopic.active == "True"){
-               $scope.checkboxStatus.active = true
-          } else {
-              $scope.checkboxStatus.active = false
-          }
-
-          if ($scope.selectedTopic.collaboration == "True"){
-               $scope.checkboxStatus.collab = true
-          } else {
-              $scope.checkboxStatus.collab = false
-          }
+          $scope.checkboxStatus.active = $scope.selectedTopic.active == "True";
+          $scope.checkboxStatus.collab = $scope.selectedTopic.collaboration == "True";
 
 
         var paramA = $scope.myDropDown;
@@ -159,9 +89,42 @@ angular.module('topicController', ['infiniteScroll'])
 
     };
 
-     
+
+    function loadQuerys() {
+
+           /////////////!!!DRY!!! also in editTopic/////////////////////////////////////////////////////////////////////
 
 
+         // now that we know the query IDs we must find the querys' objects
+
+          $scope.queryObjects = [];
+
+          if ($scope.iDsOfquerysForSelectedTopic.length >= 1) {
+
+              for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
+
+              // get the query's names here...
+              Api.QuerybyId.get({
+                  id: $scope.iDsOfquerysForSelectedTopic[i].$oid
+
+              }, function (data) {
+                  $scope.rawData = data;
+
+                  // add outputs of more than one query to the collection
+                  $scope.queryObjects.push($scope.rawData);
+
+                  console.log($scope.queryObjects);
+              })
+
+          }
+
+          } else if (!$scope.iDsOfquerysForSelectedTopic.length) {
+              console.log("There are no querys to retrieve.")
+          }
+
+
+    }
+    
     function loadTable() {
 
         console.log("Load Table with documents for Topic" +  $scope.selectedTopic.title);
@@ -170,14 +133,13 @@ angular.module('topicController', ['infiniteScroll'])
         $scope.documentCollection = [];
         console.log($scope.documentCollection);
 
-          // bind IDs of querys ...
-        $scope.iDsOfquerysForSelectedTopic = $scope.selectedTopic.querys;
-
-        console.log($scope.selectedTopic.querys);
-        console.log($scope.iDsOfquerysForSelectedTopic);
-        console.log($scope.iDsOfquerysForSelectedTopic.length);
-
         if ($scope.iDsOfquerysForSelectedTopic) {
+
+
+
+
+
+
 
             for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
 
@@ -318,8 +280,6 @@ angular.module('topicController', ['infiniteScroll'])
         // this is the redirection to the document-view, we send the doc ID and the name of the current topic
         $location.path(route).search({paramA: $scope.myDropDown})
     };
-
-    //$scope.newTopicTitle = $scope.myDropDown;
 
 
 

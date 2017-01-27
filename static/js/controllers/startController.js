@@ -3,8 +3,7 @@
  */
 
 
-angular.module('startController', [])
-.controller('StartCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
+myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
 
 
       Api.User.get({

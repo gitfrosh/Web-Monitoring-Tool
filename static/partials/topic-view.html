@@ -6,58 +6,23 @@
 
 
 
-
-
 <form role="form" name="topicForm" ng-submit="submitTopicForm()">
+
 <div class="area constrained">
 
-    <div class="row">
-
-        <div class="col-md-8 panel panel-blue panel-widget">
-
-            <div class="col-md-6">
-                <h2>{{myDropDown}} </h2>
-
-            </div>
-            <div class="col-md-6 widget-right">
-
-
-            </div>
-        </div>
+    <div ng-include="'static/partials/dropdown.html'"></div>
 
 
 
-        <div class="row no-padding">
-            <div class="panel panel-blue panel-widget">
-                <div class="col-md-2 widget-right">
-
-                    <div class="dropdown">
-
-                        <select name="pickTopic" id="pickTopic" ng-change="selectAction()" ng-model="myDropDown" class="form-control">
-
-                            <option ng-repeat="i in usertopictitles track by $index" value="{{i}}">{{i}}</option>
-
-                        </select>
-                    </div>
-
-                </div>
-                <div class="col-md-2 widget-left ">
-                    <a href="" ng-click="addTopic()">
-                        <svg class="glyph stroked plus sign " style="color:white">
-                            <use xlink:href="#stroked-plus-sign" />
-                        </svg>
-                    </a>
-
-                </div>
-            </div>
-        </div>
-    </div>
 
                 <div ng-if="selectedTopic.active == 'False'" class="row alert alert-danger">
 
                      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
             <span class="sr-only">Error:</span> Dieses Thema wurde deaktiviert.
         </div>
+
+
+
 
     <div class="row well">
                      <a href="" ng-click="editTopic()">
@@ -67,6 +32,21 @@
                 </a>
 
         </div>
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">Gespeicherte Suchanfragen</div>
+                <div class="panel-body">
+
+                    <button ng-repeat="item in queryObjects track by $index" ng-click="" type="button" class="btn btn-md btn-primary btn-rounded">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span> {{item.QUERY.term}}</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 

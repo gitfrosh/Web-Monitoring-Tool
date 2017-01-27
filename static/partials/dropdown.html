@@ -1,0 +1,42 @@
+
+
+
+            <div class="row" ng-controller="DropdownCtrl">
+
+        <div class="col-md-8 panel panel-blue panel-widget">
+
+            <div class="col-md-6">
+                <h2>{{myDropDown}} </h2>
+
+            </div>
+            <div class="col-md-6 widget-right">
+
+
+            </div>
+        </div>
+
+        <div class="row no-padding" >
+            <div class="panel panel-blue panel-widget">
+                <div class="col-md-2 widget-right">
+
+                    <div class="dropdown">
+
+                        <select name="pickTopic" id="pickTopic" ng-change="selectAction()" ng-model="myDropDown" class="form-control">
+
+                            <option ng-repeat="i in usertopictitles track by $index" value="{{i}}">{{i}}</option>
+
+                        </select>
+                    </div>
+
+                </div>
+                <div class="col-md-2 widget-left ">
+                    <a href="" ng-click="addTopic()">
+                        <svg class="glyph stroked plus sign " style="color:white">
+                            <use xlink:href="#stroked-plus-sign" />
+                        </svg>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>

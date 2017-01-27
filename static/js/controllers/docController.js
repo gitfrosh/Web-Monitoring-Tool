@@ -3,8 +3,7 @@
  */
 
 
-angular.module('docController', [])
-.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 'loggedInUser', function($scope, $routeParams, Api, $location, loggedInUser) {
+myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 'loggedInUser', function($scope, $routeParams, Api, $location, loggedInUser) {
 
     // we get the doc ID and the name of the current topic first, which were sent from topic view
     var param = $routeParams.itemId;

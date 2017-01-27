@@ -5,7 +5,6 @@ Thirdly, we collect the found documents and transfer them to the PreProcessor, w
 """
 
 import json
-from celery import Celery
 import requests
 from flask import Flask
 from time import sleep

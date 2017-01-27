@@ -35,45 +35,7 @@
 
 
 
-    <div class="row">
-
-        <div class="col-md-8 panel panel-blue panel-widget">
-
-            <div class="col-md-6">
-                <h2>{{myDropDown}}</h2>
-            </div>
-            <div class="col-md-6 widget-right">
-
-
-
-            </div>
-        </div>
-
-        <div class="row no-padding">
-            <div class="panel panel-blue panel-widget">
-                <div class="col-md-2 widget-right">
-
-                    <div class="dropdown">
-
-                        <select name="pickTopic" id="pickTopic" ng-change="selectAction()" ng-model="myDropDown" class="form-control">
-
-                            <option ng-repeat="i in usertopics track by $index" value="{{i.title}}">{{i.title}}</option>
-
-                        </select>
-                    </div>
-
-                </div>
-                <div class="col-md-2 widget-left ">
-                    <a href="" ng-click="addTopic()">
-                        <svg class="glyph stroked plus sign " style="color:white">
-                            <use xlink:href="#stroked-plus-sign" />
-                        </svg>
-                    </a>
-
-                </div>
-            </div>
-        </div>
-    </div>
+    <div ng-include="'static/partials/dropdown.html'"></div>
 
     <div class="row">
 
@@ -159,6 +121,7 @@
                 <div class="panel-body">
 
               <button type="submit" class="btn btn-default">Fertig</button>
+              <button type="button" class="btn btn-default" ng-click="cancelEdit()">Abbrechen</button>
                 </div>
 
 
