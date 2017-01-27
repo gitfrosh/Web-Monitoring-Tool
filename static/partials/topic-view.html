@@ -76,7 +76,9 @@
                 <div class="panel-heading">Trendradar</div>
                 <div class="panel-body">
                     <div class="canvas-wrapper">
-                        <canvas class="main-chart" id="line-chart" height="200" width="600"></canvas>
+                        <!--<canvas class="main-chart" id="line-chart" height="200" width="600"></canvas>-->
+                        <img src="../static/img/placeholder_trends.png">
+
                     </div>
                 </div>
             </div>
@@ -91,9 +93,12 @@
                 <div class="panel-body">
                     <div class="col-lg-10"></div>
 
-                    <label class="checkbox-inline"><span class="glyphicon glyphicon-star" style="color: red" aria-hidden="true"></span>
+                     <button ng-if="myDropDown" type="button" class="btn btn-default">
                         <input type="checkbox" id="mycheckbox" name="mycheckbox" ng-model="myCheckbox" data-ng-change="myCheckbox ? filterBookmarks() : showAll()" />
-                        <small>markierte Dokumente filtern</small></label>
+                        markierte Dokumente filtern <span class="glyphicon glyphicon-star" style="color: red" aria-hidden="true"></span>
+                    </button>
+
+
 
                     <div ng-show="documentCollection.empty" class="alert alert-danger" role="alert">
   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>

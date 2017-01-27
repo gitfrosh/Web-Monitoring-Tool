@@ -1,7 +1,7 @@
-{#
+<!--
 The content in the ng-view div will change based on the routing, but everything else on the dashboard_index.html page will be the
 same for every view of your application.
-#}
+-->
 
 
 <!DOCTYPE html>
@@ -10,35 +10,36 @@ same for every view of your application.
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Web Monitoring Tool WMT </title>
-    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="static/css/datepicker3.css" rel="stylesheet">
-    <link href="static/css/styles.css" rel="stylesheet">
+
+    <!--Bootstrap-->
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
     <link href="static/css/bootstrap-table.css" rel="stylesheet">
-<link href="static/css/styles.css" rel="stylesheet">
+
+    <!--Custom Style Sheets-->
+
+    <link href="static/css/datepicker3.css" rel="stylesheet">
+
+    <link href="static/css/styles.css" rel="stylesheet">
     <link href="static/css/menu.css" rel="stylesheet">
+
+    <!--Costum Font -->
+
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-
-
-
-
+    <link rel="stylesheet" type="text/css" href="static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
 
     <!--Icons-->
     <script src="static/js/lumino.glyphs.js"></script>
 
-<!--[if lt IE 9]>
-<script src="js/html5shiv.js"></script>
-<script src="js/respond.min.js"></script>
-<![endif]-->
+    <!--Custom Scripts -->
+    <script src="static/js/underscore.js"></script>
+    <script src="static/js/angular.min.js"></script>
+    <script src="static/js/angular-route.min.js"></script>
+    <script src="static/js/angular-resource.min.js"></script>
+    <script src="static/js/angular-filter.js"></script>
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
-    <script src="http://code.angularjs.org/1.5.3/angular-route.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.16/angular-resource.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-filter/0.5.14/angular-filter.js"></script>
-
-
-
+    <!--Angular Modules -->
     <script src="/static/js/app.js"></script>
     <script src="/static/js/factories/apiFactory.js"></script>
     <script src="/static/js/controllers/docController.js"></script>
@@ -52,34 +53,34 @@ same for every view of your application.
     <script src="/static/js/services/aService.js"></script>
 
 
-    {#Scripts: Always included#}
-<script src="static/js/jquery-1.11.1.min.js"></script>
-<script src="static/js/bootstrap.min.js"></script>
-<script src="static/js/chart.min.js"></script>
-<script src="static/js/chart-data.js"></script>
-<script src="static/js/easypiechart.js"></script>
-<script src="static/js/easypiechart-data.js"></script>
-<script src="static/js/bootstrap-datepicker.js"></script>
-<script src="static/js/bootstrap-table.js"></script>
+    <!--Custom Style Scripts -->
+    <script src="static/js/jquery-1.11.1.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/chart.min.js"></script>
+    <script src="static/js/chart-data.js"></script>
+    <script src="static/js/easypiechart.js"></script>
+    <script src="static/js/easypiechart-data.js"></script>
+    <script src="static/js/bootstrap-datepicker.js"></script>
+    <script src="static/js/bootstrap-table.js"></script>
 
 
-
-
-
-
-
+<!--[if lt IE 9]>
+<script src="js/html5shiv.js"></script>
+<script src="js/respond.min.js"></script>
+<![endif]-->
 
 </head>
 
 
-{#Begin of App - Body#}
+<!--Angular app initiates-->
 <body ng-app="myApp">
 
 
 
-{#Put Dashboard Main Content Here#}
+<!--Dashboard main content dynamically-->
 <div class="ng-view"></div>
 
+<!--the menu and header -->
 <div ng-include="'static/partials/menu.html'"></div>
 
 </body>

@@ -7,7 +7,7 @@ from time import sleep
 import requests
 
 
-def preProcessing(fetchedDocs):
+def preProcessing(fetchedDocs, query):
     print("Preprocessing documents...")
 
     for doc in fetchedDocs:
@@ -15,6 +15,8 @@ def preProcessing(fetchedDocs):
         changeKeys(doc)
         print(doc)
         deleteUnusedMetadata(doc)
+        print(doc)
+        addQuery(doc, query)
         print(doc)
 
     return
@@ -35,7 +37,14 @@ def deleteUnusedMetadata(doc):
 def chopAbstract():
     print("Chop abstract...")
 
+    # something like this: s[0:100]
+
     # absctracts shouldn't bear more than 500 characters
+    return
+
+def addQuery(doc, query):
+    print("Add query...")
+    doc['query'] = query
     return
 
 

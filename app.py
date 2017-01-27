@@ -25,8 +25,11 @@ import newsApi
 from api.document import *
 from api.query import *
 from api.user import *
+from api.source import *
 
 app = Flask(__name__)
+
+# app.py
 
 # initiate Thread and Executor
 executor = ThreadPoolExecutor(max_workers=10)
@@ -38,7 +41,6 @@ mongo = PyMongo(app, config_prefix='MONGO')
 # web app routing: only a few routes here, Angular does the rest
 @app.route('/')
 def showIndex():
-
     return render_template('dashboard_index.html')
 
 @app.route('/login/')

@@ -1,3 +1,5 @@
+#api/document.py
+
 from bson import ObjectId
 from flask import json, jsonify
 from flask_restful import reqparse, abort, Api, Resource
@@ -44,7 +46,7 @@ class DocumentsByQuery(Resource):
 
         from app import mongo
 
-        cursor = mongo.db.documents.find({"querys": { "$in": [ObjectId(queryId)]}} )
+        cursor = mongo.db.documents.find({"query": { "$in": [ObjectId(queryId)]}} )
 
         for document in cursor:
             data.append(document)
@@ -156,7 +158,10 @@ class NewDocument(Resource):
         parser.add_argument('publishedAt', type=str, required=True, help='No publishedAt given',
                             location='json')
         parser.add_argument('url', type=str, required=True, help='No user given',
-                            location='json') # maybe later
+                            location='json')
+        parser.add_argument('query', type=str, required=True, help='No query given',
+                            location='json')
+
         request_params = parser.parse_args()
         ###result = process_the_request(request_params)
 
@@ -169,7 +174,7 @@ class NewDocument(Resource):
             "bookmarks": [],
             "comments": [],
             "date": request_params['publishedAt'],
-            "querys": [],
+            "query": ObjectId(request_params['query']),
             "related_docs": [],
             "sources": {
                 "quellenab": [],
