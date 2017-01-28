@@ -41,7 +41,7 @@ mongo = PyMongo(app, config_prefix='MONGO')
 # web app routing: only a few routes here, Angular does the rest
 @app.route('/dashboard/')
 def showIndex():
-    return render_template('dashboard_index.html')
+    return render_template('dashboard.html')
 
 @app.route('/login/')
 def showLoginpage():

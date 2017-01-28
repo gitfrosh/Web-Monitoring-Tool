@@ -28,6 +28,16 @@ angular.module('apiFactory', [])
                         //data: Body of request is sent through Controller
                 }
             }),
+            DocumentbyIDUserTag: $resource('/api/document/:id/newUserTag', {}, {
+                update: {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json; charset=UTF-8'
+                    },
+                    id: '@id'
+                        //data: Body of request is sent through Controller
+                }
+            }),
             DocumentbyIDUserComment: $resource('/api/document/:id/newComment', {}, {
                 update: {
                     method: "PUT",

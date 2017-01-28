@@ -91,7 +91,7 @@ class QuerybyIDStatus(Resource):
         request_params = parser.parse_args()
 
         result1 = mongo.db.querys.update({'_id': ObjectId(queryId)},
-                                        {'$pull': {'status': {'user': request_params['query.user']}}})
+                                        {'$pull': {'status': {'user': ObjectId(request_params['query.user'])}}})
 
         result2 = mongo.db.querys.update({'_id': ObjectId(queryId)}, {
            '$push': {"status": {"user": ObjectId(request_params['query.user']), "active": request_params['query.status']}}}, upsert=True)

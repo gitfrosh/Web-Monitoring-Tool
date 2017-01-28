@@ -405,6 +405,11 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
         });
 
+        if ($scope.checkboxStatus.active == false) {
+
+        }
+        // change status of querys to false if topic is deactivated!! //todo
+
     }
 
 

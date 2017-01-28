@@ -103,8 +103,30 @@ class DocumentbyIDUserComment(Resource):
 
 class DocumentbyIDUserTag(Resource):
 
-    def put(self):
-        return
+    def put(self, documentId):
+        from app import mongo
+        parser = reqparse.RequestParser()
+        parser.add_argument('userId', type=str, required=True, help='No userId given',
+                            location='json')
+        parser.add_argument('tags', type=list, required=True, help='No Tag given',
+                            location='json')
+        request_params = parser.parse_args()
+
+        result1 = mongo.db.documents.update({'_id': ObjectId(documentId)},
+                                            {'$pull': {'tags_user': {'t_user': ObjectId(request_params['userId'])}}})
+
+        result = mongo.db.documents.update({'_id': ObjectId(documentId)}, {'$push': {
+            "tags_user": {"t_user": ObjectId(request_params['userId']), "tags": request_params['tags']}}})
+
+        response = {
+            'result1': result1,
+            'result': result,
+            'error_code': 0
+        }
+
+        data_sanitized = json.loads(json_util.dumps(response))
+        return data_sanitized
+
 
     def delete(self):
         # well... not priority! # but it should be possible to delete user-tags...

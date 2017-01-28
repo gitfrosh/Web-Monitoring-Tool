@@ -26,6 +26,8 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 
         // set containers empty so that we can freshly reload the page if necessary
         $scope.allComments = [];
         $scope.userComments = [];
+        $scope.allTags = [];
+        $scope.userTags = [];
         $scope.allBookmarks = [];
         $scope.userBookmark = [];
         $scope.userBookmark.status = false; // default
@@ -63,6 +65,29 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 
 
 
             }
+
+            $scope.allTags = $scope.document.DOCUMENT.tags_user;
+            console.log($scope.allTags);
+
+            // get user-tags
+            for (var e = 0, la = $scope.allTags.length; e < la; e++) {
+
+                if ($scope.allTags[e].t_user.$oid == userId) {
+
+                    $scope.userTags.push($scope.allTags[e].tags);
+                    $scope.userTags = _.flatten($scope.userTags);
+
+                }
+
+
+            }
+
+
+
+
+
+
+
 
             // get bookmarks of the logged in user
             // first, get all bookmarks
@@ -155,9 +180,37 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 
     $scope.submitTagForm = function() {
         console.log("Tag Form submitted ...");
         console.log($scope.newTag);
-        console.log(userId);
+        console.log($scope.userTags);
 
-        // todo
+
+        // append new Tag to list of existing Tags
+       // $scope.userTags.append($scope.newTag);
+
+        $scope.userTags = $scope.userTags.concat($scope.newTag);
+        $scope.userTags = _.flatten($scope.userTags);
+
+        console.log(userId);
+        console.log($scope.userTags);
+
+        var postData;
+        postData = {
+            "userId": userId,
+            "tags": $scope.userTags
+        };
+        console.log(postData);
+        
+
+         // put comment on the server, WHEN FINISHED load data once more
+        $scope.theNewTag = new Api.DocumentbyIDUserTag(postData);
+        $scope.theNewTag.$update({
+            id: param
+        }).then(function() {
+            loadData();
+            // form should be resetted here ...
+
+        });
+        
+
 
 
     };

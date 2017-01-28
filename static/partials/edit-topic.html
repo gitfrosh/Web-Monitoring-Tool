@@ -35,7 +35,7 @@
 
 
 
-    <div ng-include="'static/partials/dropdown.html'"></div>
+    <div ng-include="'../static/partials/dropdown.html'"></div>
 
     <div class="row">
 
@@ -51,20 +51,17 @@
                                 <input ng-pattern="/^[a-zA-Z\s]*$/" class="form-control" name="newTopicTitle" ng-model="newTopicTitle" placeholder="{{myDropDown}}">
                                 <p class="alert alert-danger" ng-show="topicForm.newTopicTitle.$error.pattern"> <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span> Titel dürfen nur Buchstaben enthalten.</p>
 
-                                <div class="col-md-6">
+                                   <p class="alert">
 
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" ng-model="checkboxStatus.active">Thema aktivieren / deaktivieren
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" ng-model="checkboxStatus.collab">Kollaboration aktivieren / deaktivieren
-                                        </label>
-                                    </div>
+                                        Thema aktivieren / deaktivieren<input class="tgl tgl-light" id="cb1" type="checkbox" ng-model="checkboxStatus.active"/>
+                                        <label class="tgl-btn" for="cb1"></label>
 
-                                </div>
+
+
+
+                                        Kollaboration aktivieren / deaktivieren<input class="tgl tgl-light" id="cb2" type="checkbox" ng-model="checkboxStatus.collab"/>
+                                        <label class="tgl-btn" for="cb2"></label>
+</p>
 
                             </div>
 
