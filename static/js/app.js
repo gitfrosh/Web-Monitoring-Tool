@@ -27,43 +27,39 @@ myApp.config(['$routeProvider',
     function($routeProvider, $locationProvider) {
         $routeProvider.
         when('/', {
-            redirectTo: '/dashboard/'
-        }).
-        when('/dashboard', {
-
             controller: 'StartCtrl',
             templateUrl: '../static/partials/start.html',
         }).
-        when('/dashboard/topic', {
+        when('/topic', {
             controller: 'TopicCtrl',
             templateUrl: '../static/partials/topic-view.html',
         }).
-         when('/dashboard/newTopic', {
+         when('/newTopic', {
             controller: 'NewTopicCtrl',
             templateUrl: '../static/partials/new-topic.html',
         }).
-         when('/dashboard/editTopic', {
+         when('/editTopic', {
             controller: 'EditTopicCtrl',
             templateUrl: '../static/partials/edit-topic.html',
         }).
-        when('/dashboard/document/:itemId', {
+        when('/document/:itemId', {
             controller: 'DocumentCtrl',
             templateUrl: '../static/partials/document-view.html',
         }).
-        when('/dashboard/newsletter', {
+        when('/newsletter', {
             templateUrl: '../static/partials/newsletter.html',
         }).
-        when('/dashboard/userconfig', {
+        when('/userconfig', {
             templateUrl: '../static/partials/user-config.html',
         }).
-        when('/dashboard/usersources', {
+        when('/usersources', {
             templateUrl: '../static/partials/user-sources.html',
         }).
-        when('/dashboard/logout', {
+        when('/logout', {
             controller: 'Logout'
         }).
         otherwise({
-            redirectTo: '/dashboard/'
+            redirectTo: '/'
         })
 
         ;

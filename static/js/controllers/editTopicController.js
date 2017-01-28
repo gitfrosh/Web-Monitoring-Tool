@@ -1,9 +1,6 @@
 /**
  * Created by ulrike on 18.01.17.
  */
-
-
-
 myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestFactory, $location, loggedInUser) {
 
     var userId = loggedInUser.userId;
@@ -24,10 +21,10 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
     $scope.showModal3 = false; // distinction between only query updated and everything else???
     $scope.showModal4 = false;
 
-         $scope.hide = function(m, postDataTitle){
-        if(m === 1){
+    $scope.hide = function(m, postDataTitle) {
+        if (m === 1) {
             $scope.showModal1 = false;
-        }else if (m === 3) {
+        } else if (m === 3) {
             $scope.showModal3 = false;
             redirectToTopic(postDataTitle)
         } else {
@@ -35,18 +32,20 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
             redirectToEditTopic(postDataTitle)
         }
     };
-    
 
 
-    $scope.cancelEdit = function () {
-            $scope.showModal1 = false;
-    $scope.showModal3 = false; // distinction between only query updated and everything else???
-    $scope.showModal4 = false;
-   var paramA = $scope.myDropDown;
-   var route = '/dashboard/topic/';
 
-   // this is the redirection to the edit-topic view, we send the topic name
-   $location.path(route).search({paramA: paramA});
+    $scope.cancelEdit = function() {
+        $scope.showModal1 = false;
+        $scope.showModal3 = false; // distinction between only query updated and everything else???
+        $scope.showModal4 = false;
+        var paramA = $scope.myDropDown;
+        var route = '/topic/';
+
+        // this is the redirection to the edit-topic view, we send the topic name
+        $location.path(route).search({
+            paramA: paramA
+        });
 
     };
 
@@ -56,45 +55,47 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
     function redirectToTopic(postDataTitle) {
 
-   var paramA = postDataTitle;
-   var route = '/dashboard/topic/';
+        var paramA = postDataTitle;
+        var route = '/topic/';
 
-   // this is the redirection to the edit-topic view, we send the topic name
-   $location.path(route).search({paramA: paramA});
+        // this is the redirection to the edit-topic view, we send the topic name
+        $location.path(route).search({
+            paramA: paramA
+        });
 
     }
 
-   function loadQuerys() {
+    function loadQuerys() {
 
-           /////////////!!!DRY!!! also in editTopic/////////////////////////////////////////////////////////////////////
+        /////////////!!!DRY!!! also in editTopic/////////////////////////////////////////////////////////////////////
 
 
-         // now that we know the query IDs we must find the querys' objects
+        // now that we know the query IDs we must find the querys' objects
 
-          $scope.queryObjects = [];
+        $scope.queryObjects = [];
 
-          if ($scope.iDsOfquerysForSelectedTopic.length >= 1) {
+        if ($scope.iDsOfquerysForSelectedTopic.length >= 1) {
 
-              for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
+            for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
 
-              // get the query's names here...
-              Api.QuerybyId.get({
-                  id: $scope.iDsOfquerysForSelectedTopic[i].$oid
+                // get the query's names here...
+                Api.QuerybyId.get({
+                    id: $scope.iDsOfquerysForSelectedTopic[i].$oid
 
-              }, function (data) {
-                  $scope.rawData = data;
+                }, function(data) {
+                    $scope.rawData = data;
 
-                  // add outputs of more than one query to the collection
-                  $scope.queryObjects.push($scope.rawData);
+                    // add outputs of more than one query to the collection
+                    $scope.queryObjects.push($scope.rawData);
 
-                  console.log($scope.queryObjects);
-              })
+                    console.log($scope.queryObjects);
+                })
 
-          }
+            }
 
-          } else if (!$scope.iDsOfquerysForSelectedTopic.length) {
-              console.log("There are no querys to retrieve.")
-          }
+        } else if (!$scope.iDsOfquerysForSelectedTopic.length) {
+            console.log("There are no querys to retrieve.")
+        }
 
 
     }
@@ -104,84 +105,81 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
     function redirectToEditTopic(postDataTitle) {
 
-   var paramA = postDataTitle;
-   var route = '/dashboard/editTopic/';
+        var paramA = postDataTitle;
+        var route = '/editTopic/';
 
-   // this is the redirection to the edit-topic view, we send the topic name
-   $location.path(route).search({paramA: paramA});
+        // this is the redirection to the edit-topic view, we send the topic name
+        $location.path(route).search({
+            paramA: paramA
+        });
 
     }
-    
-    
-            // also used i startController ---->>>> REDUNDANCE
-         Api.User.get({
+
+
+    // also used i startController ---->>>> REDUNDANCE
+    Api.User.get({
         id: loggedInUser.userId
-     }, function(data) {
+    }, function(data) {
         console.log("Load current user data and his topics ...");
         $scope.user = data;
 
         UserObjectFactory.setUserObject($scope.user);
         $scope.usertopics = UserObjectFactory.getTopics();
         $scope.usertopictitles = UserObjectFactory.getTopicTitles();
-             
-         console.log("Lade Topic view with topic " + $scope.myDropDown); // on first initiate this is empty!
 
-         UserObjectFactory.setDropdown($scope.myDropDown);
-         $scope.selectedTopic = UserObjectFactory.getselTopic();
-         $scope.iDsOfquerysForSelectedTopic = UserObjectFactory.getSelTopicQuerys();
-             
-         $scope.checkboxStatus.active = $scope.selectedTopic.active == "True";
-         $scope.checkboxStatus.collab = $scope.selectedTopic.collaboration == "True";
+        console.log("Lade Topic view with topic " + $scope.myDropDown); // on first initiate this is empty!
 
+        UserObjectFactory.setDropdown($scope.myDropDown);
+        $scope.selectedTopic = UserObjectFactory.getselTopic();
+        $scope.iDsOfquerysForSelectedTopic = UserObjectFactory.getSelTopicQuerys();
 
-         // now that we know the query IDs we must find the querys' objects
-          loadQuerys();
+        $scope.checkboxStatus.active = $scope.selectedTopic.active == "True";
+        $scope.checkboxStatus.collab = $scope.selectedTopic.collaboration == "True";
 
 
-});
+        // now that we know the query IDs we must find the querys' objects
+        loadQuerys();
+
+
+    });
 
 
 
     // Topic form process
 
     $scope.submitTopicForm = function() {
+        console.log("Topic Form submitted ...");
+        dbAction();
 
-                dbAction();
+    };
 
-            };
+
+    function existsNotYet(newTopic) {
+        // checks if user changes a topic title to an existing one
+        existsNot = _.find($scope.usertopics, function(item) {
+            return item.title === newTopic;
+        });
+
+        console.log(existsNot);
+        return !existsNot;
+
+    }
 
     function dbAction() {
 
-
-
-                // THIS FUNCTION IS MONSTROUS!!!!!
+        // THIS FUNCTION IS MONSTROUS!!!!!
 
         $scope.oldTopicTitle = $scope.myDropDown;
-
-
-        console.log("Topic Form submitted ...");
-        console.log($scope.checkboxStatus.collab);
-        console.log($scope.checkboxStatus.active);
-        console.log($scope.newTopicTitle);
-        console.log($scope.oldTopicTitle);
-        //console.log($scope.selectedTopic.querys);
-
-
-
         var postOldTitle = $scope.oldTopicTitle;
 
-        if ($scope.newTopicTitle === undefined){
+        // only remember the new topic title if user has entered any AND it differs from old one
+
+        if ($scope.newTopicTitle != $scope.oldTopicTitle && $scope.newTopicTitle != undefined && existsNotYet($scope.newTopicTitle)) {
+            $scope.postDataTitle = $scope.newTopicTitle
+
+        } else {
             $scope.postDataTitle = $scope.oldTopicTitle;
         }
-
-
-        // only remember the new topic title if user has entered one
-        if ($scope.newTopicTitle != $scope.oldTopicTitle && $scope.newTopicTitle != undefined) {
-            $scope.postDataTitle = $scope.newTopicTitle
-        } else {
-            $scope.postDataTitle =  $scope.oldTopicTitle;
-        }
-
 
         var postData;
         postData = {
@@ -196,114 +194,114 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
         if ($scope.newQuery) {
 
-                console.log("user entered: " + $scope.newQuery);
-                console.log($scope.queryObjects);
+            console.log("user entered: " + $scope.newQuery);
+            console.log($scope.queryObjects);
 
-                // check first if new Query has the same term as an existing query IN THE SAME TOPIC
-                var check = _.some($scope.queryObjects, function( el ) {
-                    return el.QUERY.term === $scope.newQuery;
-                    } );
+            // check first if new Query has the same term as an existing query IN THE SAME TOPIC
+            var check = _.some($scope.queryObjects, function(el) {
+                return el.QUERY.term === $scope.newQuery;
+            });
 
-                if (check) {
-                    console.log("This query already exists. Inform user and do nothing else."); 
-                    $scope.showModal1 = true;
-                    console.log($scope.showModal1);
-                    return
-
-
-                } else {
-                    console.log("This query is not yet in user's data. Check if the query exists overall (for another " +
-                        "user)");
-
-                        var response1 = Api.AllQuerys.get({}, function() {
-                                    console.log("GET item from server....");
-                                    });
-
-                            response1.$promise.then(function(data) {
-                        $scope.allQuerys = data.QUERYS;
-                        console.log($scope.allQuerys);
-
-                            var check2 = _.some($scope.allQuerys, function( el ) {
-                            return el.term === $scope.newQuery;
-                             } );
-                            console.log(check2);
-
-                         if (check2) {
-                                console.log("This query exists on the server. We push the status for the user to True");
-
-                                // fetch the query from server to find out the ID of the query
-                                    $scope.newQueryfromServer = _.find($scope.allQuerys, function(item) {
-                                    return item.term === $scope.newQuery;
-                                            });
-
-                                 console.log($scope.newQueryfromServer);
-                                 console.log("newID: " + $scope.newQueryfromServer._id.$oid);
+            if (check) {
+                console.log("This query already exists. Inform user and do nothing else.");
+                $scope.showModal1 = true;
+                console.log($scope.showModal1);
+                return
 
 
-                             // change queryStatus for user in db
-                                var newQueryStatusData = {
-                                     "query.status": true,
-                                     "query.user" : userId
-                                         };
+            } else {
+                console.log("This query is not yet in user's data. Check if the query exists overall (for another " +
+                    "user)");
+
+                var response1 = Api.AllQuerys.get({}, function() {
+                    console.log("GET item from server....");
+                });
+
+                response1.$promise.then(function(data) {
+                    $scope.allQuerys = data.QUERYS;
+                    console.log($scope.allQuerys);
+
+                    var check2 = _.some($scope.allQuerys, function(el) {
+                        return el.term === $scope.newQuery;
+                    });
+                    console.log(check2);
+
+                    if (check2) {
+                        console.log("This query exists on the server. We push the status for the user to True");
+
+                        // fetch the query from server to find out the ID of the query
+                        $scope.newQueryfromServer = _.find($scope.allQuerys, function(item) {
+                            return item.term === $scope.newQuery;
+                        });
+
+                        console.log($scope.newQueryfromServer);
+                        console.log("newID: " + $scope.newQueryfromServer._id.$oid);
 
 
-                                $scope.newQueryStatus = new Api.QuerybyIDStatus(newQueryStatusData).$update({
-                                    id: $scope.newQueryfromServer._id.$oid
-                                        }).then(function () {
-                                        console.log("Neuer Status gesendet..");
-                                    });
-
-                                console.log("... and we push the the queryID onto  user's data!!! ");
+                        // change queryStatus for user in db
+                        var newQueryStatusData = {
+                            "query.status": true,
+                            "query.user": userId
+                        };
 
 
-                                    var postDataQuerys2 = {
-                                            "topic.title": postDataTitle,
-                                            "query.id": $scope.newQueryfromServer._id.$oid
+                        $scope.newQueryStatus = new Api.QuerybyIDStatus(newQueryStatusData).$update({
+                            id: $scope.newQueryfromServer._id.$oid
+                        }).then(function() {
+                            console.log("Neuer Status gesendet..");
+                        });
 
-                                        };
-                                     console.log(postDataQuerys2);
-
-
-                                  $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys2);
-                                         $scope.alsoPushedQuerys.$update({
-                                                id: userId
-                                            }).then(function () {
-                                                console.log("RESET!!");
-
-                                  //DRY//!!!!!!!!!!!!!!!!
-                                $scope.showModal3 = true;
-                                console.log($scope.showModal3);
-                                
-                                //$scope.showModal3 = true;
-
-                                     });
+                        console.log("... and we push the the queryID onto  user's data!!! ");
 
 
+                        var postDataQuerys2 = {
+                            "topic.title": $scope.postDataTitle,
+                            "query.id": $scope.newQueryfromServer._id.$oid
 
-                            } else {
-                             console.log("This query does not exist on the server at all. We have to push it there, set the"+
-                                    "the value for the user to TRUE and push it to the user's data.");
-
-
-                             // that's what the new query looks like, initiated with the first user-status
-                             var newQueryData = {
-                                     'status.active': true,
-                                     'status.user': userId,
-                                     'term': $scope.newQuery
-                                         };
-                             console.log(newQueryData);
+                        };
+                        console.log(postDataQuerys2);
 
 
-                             new Api.NewQuery(newQueryData).$save().then(function () {
-                                   console.log("Send Query to db!");
+                        $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys2);
+                        $scope.alsoPushedQuerys.$update({
+                            id: userId
+                        }).then(function() {
+                            console.log("RESET!!");
+
+                            //DRY//!!!!!!!!!!!!!!!!
+                            $scope.showModal3 = true;
+                            console.log($scope.showModal3);
+
+                            //$scope.showModal3 = true;
+
+                        });
 
 
 
-                             // fetch the new ID ...
+                    } else {
+                        console.log("This query does not exist on the server at all. We have to push it there, set the" +
+                            "the value for the user to TRUE and push it to the user's data.");
 
-                                var response = Api.AllQuerys.get({}, function() {
-                                    console.log("GET item from server....");
-                                    });
+
+                        // that's what the new query looks like, initiated with the first user-status
+                        var newQueryData = {
+                            'status.active': true,
+                            'status.user': userId,
+                            'term': $scope.newQuery
+                        };
+                        console.log(newQueryData);
+
+
+                        new Api.NewQuery(newQueryData).$save().then(function() {
+                            console.log("Send Query to db!");
+
+
+
+                            // fetch the new ID ...
+
+                            var response = Api.AllQuerys.get({}, function() {
+                                console.log("GET item from server....");
+                            });
 
                             response.$promise.then(function(data) {
                                     $scope.allQuerys = data.QUERYS;
@@ -311,62 +309,58 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
 
 
-                                 // fetch the query from server to find out the ID of the query
+                                    // fetch the query from server to find out the ID of the query
                                     $scope.newQueryfromServer = _.find($scope.allQuerys, function(item) {
-                                    return item.term === $scope.newQuery;
-                                            });
+                                        return item.term === $scope.newQuery;
+                                    });
 
-                                 console.log("newID: " + $scope.newQueryfromServer);
-                                console.log("newID: " + $scope.newQueryfromServer._id.$oid);
+                                    console.log("newID: " + $scope.newQueryfromServer);
+                                    console.log("newID: " + $scope.newQueryfromServer._id.$oid);
 
-                                  var updateQueryinTopic = {
-                                    "topic.title": $scope.postDataTitle,
-                                    "query.id" : $scope.newQueryfromServer._id.$oid
+                                    var updateQueryinTopic = {
+                                        "topic.title": $scope.postDataTitle,
+                                        "query.id": $scope.newQueryfromServer._id.$oid
 
-                                 };
-                                console.log(updateQueryinTopic);
+                                    };
+                                    console.log(updateQueryinTopic);
 
-                                new Api.UserbyIDNewQuery(updateQueryinTopic).$update({
-                                 id: userId
-                                    }).then(function () {
-                                   console.log("RESET!!");
+                                    new Api.UserbyIDNewQuery(updateQueryinTopic).$update({
+                                        id: userId
+                                    }).then(function() {
+                                        console.log("RESET!!");
 
-                                 //DRY//!!!!!!!!!!!!!!!!
-                                console.log($scope.postDataTitle);
-                                 //DRY//!!!!!!!!!!!!!!!!
-                                $scope.showModal3 = true;
-                                console.log($scope.showModal3);
+                                        //DRY//!!!!!!!!!!!!!!!!
+                                        console.log($scope.postDataTitle);
+                                        //DRY//!!!!!!!!!!!!!!!!
+                                        $scope.showModal3 = true;
+                                        console.log($scope.showModal3);
 
-                });
-                            }
+                                    });
+                                }
 
                             );
 
 
 
-                                       });
+                        });
 
 
 
 
+                    }
+                });
 
 
-
-
-                                             }});
-
-
-
-                                    }
-
-
-
-
-
-            } else {
-                console.log("this case actually cannot happen.");
 
             }
+
+
+
+
+        } else {
+            console.log("User did not enter a new query.");
+
+        }
 
 
         // put topic in db, WHEN FINISHED load data once more
@@ -389,15 +383,15 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
                     $scope.alsoPushedQuerys = new Api.UserbyIDNewQuery(postDataQuerys);
                     $scope.alsoPushedQuerys.$update({
                         id: userId
-                    }).then(function () {
+                    }).then(function() {
                         console.log("RESET!!");
 
-                                //DRY//!!!!!!!!!!!!!!!!
+                        //DRY//!!!!!!!!!!!!!!!!
                         console.log($scope.postDataTitle);
 
-                          //DRY//!!!!!!!!!!!!!!!!
-                                $scope.showModal3 = true;
-                                console.log($scope.showModal3);
+                        //DRY//!!!!!!!!!!!!!!!!
+                        $scope.showModal3 = true;
+                        console.log($scope.showModal3);
                     });
 
                 }
@@ -412,7 +406,6 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
         });
 
     }
-
 
 
 

@@ -1,21 +1,63 @@
+
+
+
+
+<!--
+The content in the ng-view div will change based on the routing, but everything else on the dashboard_index.html page will be the
+same for every view of your application.
+-->
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Login Page</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Monitoring Tool WMT </title>
+
+        <!--Bootstrap-->
+
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+
+    <!--Custom Style Sheets-->
+
+    <link href="../static/css/login.css" rel="stylesheet">
+    <link href="../static/css/styles.css" rel="stylesheet">
+
+
+    <!--Costum Font -->
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+
+    <!--Custom Scripts -->
+    <script src="../static/js/angular.min.js"></script>
+    <script src="../static/js/angular-route.min.js"></script>
+    <script src="../static/js/angular-resource.min.js"></script>
+
+
+    <!--Angular Modules -->
+    <script src="../static/js/app.js"></script>
+    <script src="../static/js/login.js"></script>
+
+    <!--Custom Style Scripts -->
+    <script src="../static/js/jquery-1.11.1.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+
+
 </head>
-<body>
 
 
-<div class="input-group margin-bottom-sm">
-  <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
-  <input class="form-control" type="text" placeholder="Email address">
-</div>
-<div class="input-group">
-  <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
-  <input class="form-control" type="password" placeholder="Password">
-</div>
+
+<!--Angular app initiates-->
+<body ng-app="login">
+
+
+
+<!--Dashboard main content dynamically-->
+<div class="ng-view"></div>
 
 
 </body>
+
 </html>

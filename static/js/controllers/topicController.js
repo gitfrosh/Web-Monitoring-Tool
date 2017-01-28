@@ -80,7 +80,7 @@ myApp.controller('TopicCtrl', function($scope, Api, QueryObjectFactory, UserObje
 
 
         var paramA = $scope.myDropDown;
-        var route = '/dashboard/editTopic/';
+        var route = '/editTopic/';
 
         // this is the redirection to the edit-topic view, we send the topic name
         $location.path(route).search({paramA: paramA});
@@ -274,7 +274,7 @@ myApp.controller('TopicCtrl', function($scope, Api, QueryObjectFactory, UserObje
         console.log("Select item in table and pass it to the doc view ...");
 
         var paramA = $scope.myDropDown;
-        var route = '/dashboard/document/' + item._id.$oid;
+        var route = '/document/' + item._id.$oid;
         console.log(item._id.$oid);
 
         // this is the redirection to the document-view, we send the doc ID and the name of the current topic

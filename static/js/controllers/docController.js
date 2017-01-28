@@ -115,7 +115,7 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 
 
         // this is the redirection to the topic-view, we don't need to reassign paramA (current topic) cause it's still
         // available through "search()"
-        $location.path('/dashboard/topic');//.search({paramA: paramA})
+        $location.path('/topic');//.search({paramA: paramA})
 
     };
 

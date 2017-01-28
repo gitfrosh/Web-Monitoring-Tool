@@ -30,7 +30,7 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
 
         var paramA = $scope.myDropDown;
-        var route = '/dashboard/topic/';
+        var route = '/topic/';
 
 
         // this is the redirection to the topic-view, we send the name of the current topic
@@ -53,7 +53,7 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
 
         var paramA = title;
-        var route = '/dashboard/topic/';
+        var route = '/topic/';
 
 
         // this is the redirection to the topic-view, we send the name of the current topic
@@ -76,7 +76,7 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
             $scope.iDsOfquerysForSelectedTopic = {};
             $scope.oldTopicTitle = "";*/
 
-        var route = '/dashboard/newTopic';
+        var route = '/newTopic';
 
 
         // this is the redirection to the new-topic-form

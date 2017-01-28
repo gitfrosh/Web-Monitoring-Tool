@@ -39,21 +39,13 @@ app.config["MONGO_DBNAME"] = "wmt-test"
 mongo = PyMongo(app, config_prefix='MONGO')
 
 # web app routing: only a few routes here, Angular does the rest
-@app.route('/')
+@app.route('/dashboard/')
 def showIndex():
     return render_template('dashboard_index.html')
 
 @app.route('/login/')
 def showLoginpage():
     return render_template('login.html')
-
-@app.route('/admin/')
-def showAdmin():
-    return render_template('admin.html')
-
-def sayHello():
-  print ('Hello!')
-  return 'hello.'
 
 
 # special file handlers and error handlers
@@ -72,7 +64,7 @@ def page_not_found(e):
 # periodic task
 def run_every_10_seconds():
     print("Start periodic task!")
-    executor.submit(newsApi.collectDocuments)
+    #executor.submit(newsApi.collectDocuments)
    # executor.submit(newsApi.fetchQuerys())
     #executor.submit(newsApi.requestNewsAPI())
 
@@ -105,7 +97,7 @@ myRestApi.add_resource(User, "/api/users/<string:userId>")  # rename in "user"
     # update user's data
     # create/delete new topics and querys
 myRestApi.add_resource(UserbyIDNewQuery, "/api/user/<string:userId>/newQuery")
-    # restApi.add_resource(UserbyIDNewQuery, "/api/user/<string:userId>/deleteQuery") #todo
+    # restApi.add_resource(UserbyIDDeleteQuery, "/api/user/<string:userId>/deleteQuery") #todo
     # create or edit topic
 myRestApi.add_resource(UserbyIdTopic, "/api/user/<string:userId>/topic")
 

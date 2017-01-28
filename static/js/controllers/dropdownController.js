@@ -4,9 +4,22 @@
 
 
 
-myApp.controller('DropdownCtrl', function($scope, $location, Api, loggedInUser) {
+myApp.controller('DropdownCtrl', function($scope, UserObjectFactory, $location, Api, loggedInUser) {
 
     $scope.myDropDown = $location.search().paramA;
+
+            // also used i startController ---->>>> REDUNDANCE
+         Api.User.get({
+        id: loggedInUser.userId
+     }, function(data) {
+        console.log("Load current user data and his topics ...");
+        $scope.user = data;
+
+        UserObjectFactory.setUserObject($scope.user);
+        $scope.usertopics = UserObjectFactory.getTopics();
+        $scope.usertopictitles = UserObjectFactory.getTopicTitles();
+
+             });
 
 
       $scope.selectAction = function() {
@@ -18,7 +31,7 @@ myApp.controller('DropdownCtrl', function($scope, $location, Api, loggedInUser) 
         console.log("Lade Topic view with topic " + $scope.myDropDown);
 
         var paramA = $scope.myDropDown;
-        var route = '/dashboard/topic/';
+        var route = '/topic/';
 
 
         // this is the redirection to the topic-view, we send the name of the current topic
@@ -37,11 +50,11 @@ myApp.controller('DropdownCtrl', function($scope, $location, Api, loggedInUser) 
             $scope.iDsOfquerysForSelectedTopic = {};
             $scope.oldTopicTitle = "";
 
-
-        var route = '/dashboard/newTopic/';
+        var paramA = "";
+        var route = '/newTopic/';
 
         // this is the redirection to the edit-topic view, we send the topic name
-        $location.path(route);
+        $location.path(route).search({paramA: ""});
 
 
 

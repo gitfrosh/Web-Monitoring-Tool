@@ -5,6 +5,7 @@
 
 myApp.controller('NewTopicCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
 
+    $scope.myDropDown = "";
     $scope.checkboxStatus = {};
     $scope.checkboxStatus.active = false;
     $scope.checkboxStatus.collab = false;
@@ -25,7 +26,7 @@ myApp.controller('NewTopicCtrl', function($scope, Api, TestFactory, $location, l
     function redirect() {
 
         var paramA = $scope.newTopicTitle;
-        var route = '/dashboard/editTopic/';
+        var route = '/editTopic/';
 
         // this is the redirection to the edit-topic view, we send the topic name
         $location.path(route).search({paramA: paramA});
@@ -45,7 +46,7 @@ myApp.controller('NewTopicCtrl', function($scope, Api, TestFactory, $location, l
         // evtl. Dialogbox...
 
         console.log("Lade Dashboard neu");
-        var route = '/dashboard/';
+        var route = '/';
 
         // this is the redirection to dashboard
         $location.path(route);
