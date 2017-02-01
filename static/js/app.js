@@ -3,7 +3,7 @@
 // ///////////////////////////////////////////////Module
 
 var myApp = angular.module('myApp', [
-    'apiFactory', 'sharedServices','testFactory','ngRoute', 'ngResource', 'angular.filter'
+    'sharedServices','testFactory','ngRoute', 'ngResource', 'angular.filter'
 ]);
 
 

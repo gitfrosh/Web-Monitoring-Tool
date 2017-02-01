@@ -96,7 +96,6 @@
                         </thead>
                         <tbody>
 
-                            <!--limitTo:barLimit track by $index  -->
                             <tr ng-repeat="item in documentCollection | limitTo:barLimit | unique: 'item._id.$oid'" ng-click="selectDocument(item)">
                                 <td>{{item.title}}</td>
                                 <td>{{item.date}}</td>

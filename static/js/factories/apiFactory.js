@@ -5,8 +5,9 @@
 // ///////////////////////////////////////////////Factories
 
 
-angular.module('apiFactory', [])
-.factory('Api', ['$resource',
+/* static/js/factories/apiFactory.js */
+
+myApp.factory('Api', ['$resource',
     function($resource) {
 
         return {
@@ -75,9 +76,8 @@ angular.module('apiFactory', [])
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json; charset=UTF-8'
-                    },
-                    id: '@id'
-                        //data: Body of request is sent through Controller
+                    }
+                            //data: Body of request is sent through Controller
                 }
                 }),
 

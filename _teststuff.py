@@ -1,18 +1,21 @@
 # app.py
 
-from flask import Flask
-from flask_restful import Api
+from flask import Flask, render_template
+from flask_pymongo import PyMongo
+# more imports..
 
 app = Flask(__name__)
 
-# more Flask configuration here ..
+app.config["MONGO_DBNAME"] = "wmt-test"
+mongo = PyMongo(app, config_prefix='MONGO')
 
-myRestApi = Api(app)
-    # POST
-    # web monitoring backend API
-myRestApi.add_resource(NewDocument, "/api/documents/")
 
-    # GET
-myRestApi.add_resource(AllDocuments, "/api/documents/")
-myRestApi.add_resource(DocumentsByQuery, "/api/documents/<string:queryId>")  # rename in api/documents/querys/
-myRestApi.add_resource(DocumentbyID, "/api/document/<string:documentId>")
+
+
+#api/document.py
+
+def get(self):
+
+    from app import mongo
+
+    cursor = mongo.db.documents.find({})

@@ -183,6 +183,8 @@ class NewDocument(Resource):
                             location='json')
         parser.add_argument('query', type=str, required=True, help='No query given',
                             location='json')
+        parser.add_argument('tags_system', type=list, required=True, help='No tags given',
+                            location='json')
 
         request_params = parser.parse_args()
         ###result = process_the_request(request_params)
@@ -190,6 +192,7 @@ class NewDocument(Resource):
         #dmongo.db.documents.insert_many([{'i': i} for i in range(10000)]).inserted_ids
 
         # for i in dict(parser):
+
 
         result = mongo.db.documents.insert({
             "abstract": request_params['abstract'],
@@ -203,14 +206,19 @@ class NewDocument(Resource):
                 "quellenunab": False
             },
             "super_doc": "",
-            "tags_system": [],
+            "tags_system": request_params['tags_system'],
             "tags_user": [],
             "title": request_params['title'],
             "url": request_params['url']
         })
 
+        # create an index everytime a new doc was inserted, to prevent duplicate entries regarding url!!
+        # throws error
+        #result1 = mongo.db.documents.create_index([('url')], unique=True)
+
         response = {
             'result': result,
+        #    'result1': result1,
             'error_code': 0
         }
 

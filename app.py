@@ -64,7 +64,7 @@ def page_not_found(e):
 # periodic task
 def run_every_10_seconds():
     print("Start periodic task!")
-    #executor.submit(newsApi.collectDocuments)
+    executor.submit(newsApi.collectDocuments)
    # executor.submit(newsApi.fetchQuerys())
     #executor.submit(newsApi.requestNewsAPI())
 
@@ -148,7 +148,7 @@ myRestApi.add_resource(DocumentbyIDSource, "/api/document/<string:documentId>/ne
 if __name__ == "__main__":
 
 
-    schedule.every(10).seconds.do(run_every_10_seconds)
+    #schedule.every(30).seconds.do(run_every_10_seconds)
     t = Thread(target=run_schedule)
     t.start()
     app.run(host='0.0.0.0',use_reloader=False, debug=True, threaded=True)
