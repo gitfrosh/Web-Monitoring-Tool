@@ -1,10 +1,11 @@
 #api/document.py
-
+import pymongo
 from bson import ObjectId
 from flask import json, jsonify
 from flask_restful import reqparse, abort, Api, Resource
 from bson import json_util, ObjectId
 import json
+from pymongo import errors
 
 
 #CRUD Operations:
@@ -187,38 +188,40 @@ class NewDocument(Resource):
                             location='json')
 
         request_params = parser.parse_args()
-        ###result = process_the_request(request_params)
-
-        #dmongo.db.documents.insert_many([{'i': i} for i in range(10000)]).inserted_ids
-
-        # for i in dict(parser):
 
 
-        result = mongo.db.documents.insert({
-            "abstract": request_params['abstract'],
-            "bookmarks": [],
-            "comments": [],
-            "date": request_params['publishedAt'],
-            "query": ObjectId(request_params['query']),
-            "related_docs": [],
-            "sources": {
-                "quellenab": [],
-                "quellenunab": False
-            },
-            "super_doc": "",
-            "tags_system": request_params['tags_system'],
-            "tags_user": [],
-            "title": request_params['title'],
-            "url": request_params['url']
-        })
+        try:
+            result = mongo.db.documents.insert({
+                "abstract": request_params['abstract'],
+                "bookmarks": [],
+                "comments": [],
+                "date": request_params['publishedAt'],
+                "query": ObjectId(request_params['query']),
+                "related_docs": [],
+                "sources": {
+                    "quellenab": [],
+                    "quellenunab": False
+                },
+                "super_doc": "",
+                "tags_system": request_params['tags_system'],
+                "tags_user": [],
+                "title": request_params['title'],
+                "url": request_params['url']
+            })
 
-        # create an index everytime a new doc was inserted, to prevent duplicate entries regarding url!!
-        # throws error
-        #result1 = mongo.db.documents.create_index([('url')], unique=True)
+        except pymongo.errors.DuplicateKeyError as e:
+            result = {}
+            result['success'] = False
+            result['error'] = ("This document's title already exists. Document was not inserted into db.")
+
+
+        # create an index everytime a new doc was inserted, to prevent duplicate entries regarding title!!
+        # we could prevent duplicate entries also through unify the url or other metadata..
+        result1 = mongo.db.documents.create_index([('title', pymongo.ASCENDING)], unique=True)
 
         response = {
             'result': result,
-        #    'result1': result1,
+            'result1': result1,
             'error_code': 0
         }
 

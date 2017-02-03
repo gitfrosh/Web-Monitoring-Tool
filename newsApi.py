@@ -76,6 +76,8 @@ def requestWebhose(query):
     apiKey = "99105d4f-bdaa-4ae6-8944-be95bf482266"
     url = "http://webhose.io/search?token="+apiKey+"&format=json&q=%22"+query+"%22%20language%3A(german)%20(site_type%3Anews)"#
 
+
+
     r = requests.get(url).json()
 
     fetchedDocs = r['posts']

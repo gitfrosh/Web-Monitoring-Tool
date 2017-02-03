@@ -162,6 +162,7 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
         console.log(existsNot);
         return !existsNot;
+        // we should inform the user if he entered a topic title that already exists //todo
 
     }
 

@@ -1,116 +1,133 @@
-<style>.constrained {
-    height:900px;
-    overflow-y:scroll;
-}
+<style>
+    .constrained {
+        height: 900px;
+        overflow-y: scroll;
+    }
 </style>
-
-
 
 <form role="form" name="topicForm" ng-submit="submitTopicForm()">
 
-<div class="area constrained">
+    <div class="area constrained">
 
-    <div ng-include="'../static/partials/dropdown.html'"></div>
+        <div ng-include="'../static/partials/dropdown.html'"></div>
 
+        <div ng-if="selectedTopic.active == 'False'" class="row alert alert-danger">
 
-
-
-                <div ng-if="selectedTopic.active == 'False'" class="row alert alert-danger">
-
-                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
             <span class="sr-only">Error:</span> Dieses Thema wurde deaktiviert.
         </div>
 
-
-
-
-    <div class="row well">
-                     <a href="" ng-click="editTopic()">
-                    <button ng-if="myDropDown" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Bearbeiten
-                    </button>
-                </a>
+        <div class="row well">
+            <a href="" ng-click="editTopic()">
+                <button ng-if="myDropDown" type="button" class="btn btn-default">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Bearbeiten
+                </button>
+            </a>
 
         </div>
 
-    <div class="row">
+        <div class="row">
 
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">Gespeicherte Suchanfragen</div>
-                <div class="panel-body">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Gespeicherte Suchanfragen</div>
+                    <div class="panel-body">
 
-                    <button ng-repeat="item in queryObjects track by $index" ng-click="" type="button" class="btn btn-md btn-primary btn-rounded">
-                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span> {{item.QUERY.term}}</button>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">Trendradar</div>
-                <div class="panel-body">
-                    <div class="canvas-wrapper">
-                        <!--<canvas class="main-chart" id="line-chart" height="200" width="600"></canvas>-->
-                        <img src="../static/img/placeholder_trends.png">
+                        <button ng-repeat="item in queryObjects track by $index" ng-click="" type="button" class="btn btn-md btn-primary btn-rounded">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span> {{item.QUERY.term}}</button>
 
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Trendradar</div>
+                    <div class="panel-body">
+                        <div class="canvas-wrapper">
+                            <!--<canvas class="main-chart" id="line-chart" height="200" width="600"></canvas>-->
+                            <img src="../static/img/placeholder_trends.png">
 
-            <div class="panel panel-default">
-                <div class="panel-heading">Latest News</div>
-                <div class="panel-body">
-                    <div class="col-lg-10"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                     <button ng-if="myDropDown" type="button" class="btn btn-default">
-                        <input type="checkbox" id="mycheckbox" name="mycheckbox" ng-model="myCheckbox" data-ng-change="myCheckbox ? filterBookmarks() : showAll()" />
-                        markierte Dokumente filtern <span class="glyphicon glyphicon-star" style="color: red" aria-hidden="true"></span>
-                    </button>
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">Latest News</div>
+                    <div class="panel-body">
+<div class="col-lg-5">
+
+                        <form>
+
+                                <div class="input-group">
+                                    <span class="input-group-addon">Suche ..</span>
+                                    <input type="text" class="form-control" ng-model="searchDoc">
+                                </div>
+
+                        </form>
+</div>
+
+                         <div class="col-lg-3" ng-if="myDropDown">
 
 
 
-                    <div ng-show="documentCollection.empty" class="alert alert-danger" role="alert">
-  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-  <span class="sr-only">Error:</span>
-  Es gibt keine markierten Dokumente in dieser Collection.
+    <div class="input-group">
+      <span class="input-group-addon">
+       <input type="checkbox" id="mycheckbox" name="mycheckbox" ng-model="myCheckbox" data-ng-change="myCheckbox ? filterBookmarks() : showAll()" />
+      </span>
+      <span class="input-group-addon"><i class="glyphicon glyphicon-star" style="color: red" aria-hidden="true"></i> markierte Dokumente filtern </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+                        <div class="col-lg-5">
+
+
 </div>
 
 
-                    <table class="table table-hover" infinite-scroll="increaseLimit()" infinite-scroll-container='".constrained"'>
-                        <thead>
-                            <tr>
-                                <th style="width: 80%">Title</th>
-                                <th style="width: 20%">Datum</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                        <div class= "panel-body col-lg-12">
+                        <table class="table table-hover" infinite-scroll="increaseLimit()" infinite-scroll-container='".constrained"'>
+                            <thead style="background-color: whitesmoke">
+                                <tr>
+                                    <td>
+                                        <a ng-click="sortType = 'title'; sortReverse = !sortReverse">
+            <span style="font-size: large">Title</span>
+            <span ng-if="sortType == 'title' && !sortReverse" class="fa fa-caret-down fa-lg"></span>
+            <span ng-if="sortType == 'title' && sortReverse" class="fa fa-caret-up fa-lg"></span>
+          </a>
+                                    </td>
+                                    <td>
+                                        <a ng-click="sortType = 'date'; sortReverse = !sortReverse">
+              <span style="font-size: large">Datum</span>
+          <span ng-if="sortType == 'date' && !sortReverse" class="fa fa-caret-down fa-lg"></span>
+          <span ng-if="sortType == 'date' && sortReverse" class="fa fa-caret-up fa-lg"></span>
 
-                            <tr ng-repeat="item in documentCollection | limitTo:barLimit | unique: 'item._id.$oid'" ng-click="selectDocument(item)">
-                                <td>{{item.title}}</td>
-                                <td>{{item.date}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+          </a>
+                                    </td>
+                                </tr>
+                            </thead>
 
+                            <tbody>
+
+                                <tr ng-repeat="item in documentCollection | filter:searchDoc | orderBy:sortType:sortReverse | limitTo:barLimit | unique: 'item._id.$oid'" ng-click="selectDocument(item)">
+                                    <td style="width: 75%">{{item.title}}</td>
+                                    <td>{{item.date}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+</div>
+                    </div>
                 </div>
+
             </div>
 
         </div>
 
     </div>
-
-
-
-</div>
 </form>

@@ -3,7 +3,7 @@
 // ///////////////////////////////////////////////Module
 
 var myApp = angular.module('myApp', [
-    'sharedServices','testFactory','ngRoute', 'ngResource', 'angular.filter'
+    'infiniteScroll', 'sharedServices','testFactory','ngRoute', 'ngResource', 'angular.filter'
 ]);
 
 

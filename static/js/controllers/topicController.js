@@ -22,6 +22,11 @@ myApp.controller('TopicCtrl', function($scope, Api, QueryObjectFactory, UserObje
     $scope.documentCollection = [];
     $scope.documentCollection.empty = false;
 
+    // stuff to handle the documents' table: sort, search
+    $scope.sortType = 'title'; // set the default sort type
+    $scope.sortReverse = false;  // set the default sort order
+    $scope.searchDoc   = '';     // set the default search/filter term
+
 
     initiateView();
 
@@ -169,7 +174,7 @@ myApp.controller('TopicCtrl', function($scope, Api, QueryObjectFactory, UserObje
             $scope.increaseLimit = function() {
             $scope.barLimit += 2;
 
-                $scope.documentCollection.empty = false;
+                //$scope.documentCollection.empty = false;
 
     };
 
