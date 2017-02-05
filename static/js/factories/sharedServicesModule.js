@@ -46,6 +46,7 @@ sharedServices.factory('QueryObjectFactory', function(Api){
 
 
 sharedServices.factory('UserObjectFactory', function(Api){
+    
 
     _userObject = "";
     _dropdown ="";
@@ -63,11 +64,14 @@ sharedServices.factory('UserObjectFactory', function(Api){
         setUserObject: function (userObject) {
             _userObject = userObject;
         },
+    
 
         setDropdown: function (dropdown) {
             _dropdown = dropdown;
         },
-
+      
+        
+             
 
         getTopics: function () {
 

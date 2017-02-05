@@ -1,8 +1,9 @@
 from bson import ObjectId
-from flask import json, jsonify
+from flask import json, jsonify, session
 from flask_restful import reqparse, abort, Api, Resource
 from bson import json_util, ObjectId
 import json
+
 
 #CRUD Operations:
 #Create (POST) - Make something
@@ -10,18 +11,64 @@ import json
 #Update (PUT) - Change something
 #Delete (DELETE)- Remove something
 
-# have the API return the updated (or created) representation as part of the response.
-# In case of a POST that resulted in a creation, use a HTTP 201 status code and include a Location header
-# that points to the URL of the new resource.
+class LogoutUser(Resource):
+    def get(self):
+        session.pop('logged_in', None)
+        return jsonify({'result': 'success'})
+
+
+class UserStatus(Resource):
+    def get(self):
+
+        if session.get('logged_in'):
+            if session['logged_in']:
+                return jsonify({'status': True})
+        else:
+            return jsonify({'status': False})
+
+class VerifyUser(Resource):
+
+    def post(self):
+        from app import mongo
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type=str, required=True, help='No email given',
+                            location='json')
+        parser.add_argument('password', type=str, required=True, help='No password given',
+                            location='json')
+
+        request_params = parser.parse_args()
+
+        data = {}
+        userId = ""
+
+        data = mongo.db.users.find_one({'email': request_params['email']})
+
+        auth = False
+
+        if data:
+            auth = (data['password'] == request_params['password'])
+
+        if auth:
+            session['logged_in'] = True
+            status = True
+            userId = ObjectId(data['_id'])
+
+
+        else:
+            status = False
+
+        userId_sanitized = json.loads(json_util.dumps(userId))
+        return jsonify({'result': status}, {"userId": userId_sanitized['$oid']})
+
 
 class User(Resource):
 
-    def get(self, userId):
-        data = []
-        from app import mongo
 
-        # as long as there is no authentification process, userid is just hardcoded!
-        # use userid to find specific user
+
+    def get(self, userId):
+
+        from app import mongo
 
         # we must "sanitize" the returned BSON when jsonifying it, because otherwise there will be a TypeError due to
         # the ObjectIds!

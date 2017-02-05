@@ -26,7 +26,7 @@ myApp.controller('NewTopicCtrl', function($scope, Api, TestFactory, $location, l
     function redirect() {
 
         var paramA = $scope.newTopicTitle;
-        var route = '/editTopic/';
+        var route = 'editTopic';
 
         // this is the redirection to the edit-topic view, we send the topic name
         $location.path(route).search({paramA: paramA});
@@ -57,7 +57,7 @@ myApp.controller('NewTopicCtrl', function($scope, Api, TestFactory, $location, l
 
 
 
-    var userId = loggedInUser.userId;
+    var userId = loggedInUser.getUserId()
        // Topic form process
     $scope.submitTopicForm = function() {
 

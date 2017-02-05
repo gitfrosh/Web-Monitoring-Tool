@@ -9,7 +9,7 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 
     var param = $routeParams.itemId;
     var currentTopic = $location.search().paramA;
 
-    var userId = loggedInUser.userId;
+    var userId = loggedInUser.getUserId();
 
     // set the comment area off when loading the page
     $scope.commentAreaToggledOn = [];
@@ -140,7 +140,7 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 
 
         // this is the redirection to the topic-view, we don't need to reassign paramA (current topic) cause it's still
         // available through "search()"
-        $location.path('/topic');//.search({paramA: paramA})
+        $location.path('topic');//.search({paramA: paramA})
 
     };
 

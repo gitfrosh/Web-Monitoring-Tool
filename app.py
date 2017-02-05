@@ -16,9 +16,12 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 from time import sleep
 
+
 import executor as executor
+import requests
 import schedule
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
+
 from flask_pymongo import PyMongo
 
 import newsApi
@@ -43,10 +46,40 @@ mongo = PyMongo(app, config_prefix='MONGO')
 def showIndex():
     return render_template('dashboard.html')
 
-@app.route('/login/')
-def showLoginpage():
-    return render_template('login.html')
+# @app.route('/home/')
+# def showLoginpage():
+#     return render_template('_home.html')
 
+
+# @app.route('/api/logout/')
+# def logout():
+#     session.pop('logged_in', None)
+#     return jsonify({'result': 'success'})
+
+
+# @app.route('/api/status/')
+# def status():
+#     if session.get('logged_in'):
+#         if session['logged_in']:
+#             return jsonify({'status': True})
+#     else:
+#         return jsonify({'status': False})
+
+@app.route('/api/register/', methods=['POST'])
+def register():
+    # json_data = request.json
+    # user = User(
+    #     email=json_data['email'],
+    #     password=json_data['password']
+    # )
+    # try:
+    #     db.session.add(user)
+    #     db.session.commit()
+    #     status = 'success'
+    # except:
+    #     status = 'this user is already registered'
+    # db.session.close()
+    return #jsonify({'result': status})
 
 # special file handlers and error handlers
 @app.errorhandler(404)
@@ -87,8 +120,10 @@ myRestApi.add_resource(AllUsers, "/api/users/")
 myRestApi.add_resource(User, "/api/users/<string:userId>")  # rename in "user"
 
     # POST
-    # new user, maybe later
-    # restApi.add_resource(NewUser, "/api/users/") # todo
+
+myRestApi.add_resource(VerifyUser, "/api/users/")
+myRestApi.add_resource(LogoutUser, "/api/logout/")
+myRestApi.add_resource(UserStatus, "/api/status/")
 
     # DELETE
     # we don't need for now
@@ -146,8 +181,7 @@ myRestApi.add_resource(DocumentbyIDSource, "/api/document/<string:documentId>/ne
 # STARTS THE SERVER!
 
 if __name__ == "__main__":
-
-
+    app.secret_key = 'myKey'
     #schedule.every(30).seconds.do(run_every_10_seconds)
     t = Thread(target=run_schedule)
     t.start()

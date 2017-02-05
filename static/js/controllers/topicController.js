@@ -8,7 +8,7 @@ myApp.controller('TopicCtrl', function($scope, Api, QueryObjectFactory, UserObje
 
     // this controller is actually too big and complex
 
-    var userId = loggedInUser.userId;
+    var userId = loggedInUser.getUserId();
 
     // initiate some variables
     $scope.user = {};
@@ -41,7 +41,7 @@ myApp.controller('TopicCtrl', function($scope, Api, QueryObjectFactory, UserObje
 
         // also used i startController ---->>>> REDUNDANCE
          Api.User.get({
-        id: loggedInUser.userId
+        id: loggedInUser.getUserId()
      }, function(data) {
         console.log("Load current user data and his topics ...");
         $scope.user = data;
@@ -85,7 +85,7 @@ myApp.controller('TopicCtrl', function($scope, Api, QueryObjectFactory, UserObje
 
 
         var paramA = $scope.myDropDown;
-        var route = '/editTopic/';
+        var route = 'editTopic';
 
         // this is the redirection to the edit-topic view, we send the topic name
         $location.path(route).search({paramA: paramA});

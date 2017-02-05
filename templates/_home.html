@@ -1,13 +1,3 @@
-
-
-
-
-<!--
-The content in the ng-view div will change based on the routing, but everything else on the dashboard.html page will be the
-same for every view of your application.
--->
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -25,20 +15,31 @@ same for every view of your application.
     <link href="../static/css/styles.css" rel="stylesheet">
 
 
+
+
     <!--Costum Font -->
 
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
 
-    <!--Custom Scripts -->
+
+
+        <!--Custom Scripts -->
+    <script src="../static/js/underscore.js"></script>
     <script src="../static/js/angular.min.js"></script>
     <script src="../static/js/angular-route.min.js"></script>
     <script src="../static/js/angular-resource.min.js"></script>
+    <script src="../static/js/angular-filter.js"></script>
 
 
     <!--Angular Modules -->
+    <script src="../static/js/_login.js"></script>
     <script src="../static/js/app.js"></script>
-    <script src="../static/js/login.js"></script>
+    <script src="../static/js/factories/apiFactory.js"></script>
+    <script src="../static/js/factories/sharedServicesModule.js"></script>
+    <script src="../static/js/factories/testFactory.js"></script>
+
+
 
     <!--Custom Style Scripts -->
     <script src="../static/js/jquery-1.11.1.min.js"></script>
@@ -46,8 +47,6 @@ same for every view of your application.
 
 
 </head>
-
-
 
 <!--Angular app initiates-->
 <body ng-app="login">

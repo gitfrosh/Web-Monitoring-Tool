@@ -3,7 +3,7 @@
  */
 myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestFactory, $location, loggedInUser) {
 
-    var userId = loggedInUser.userId;
+    var userId = loggedInUser.getUserId();
     $scope.myDropDown = $location.search().paramA;
     console.log($scope.myDropDown);
     //$scope.selectedTopic = {};
@@ -40,7 +40,7 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
         $scope.showModal3 = false; // distinction between only query updated and everything else???
         $scope.showModal4 = false;
         var paramA = $scope.myDropDown;
-        var route = '/topic/';
+        var route = 'topic';
 
         // this is the redirection to the edit-topic view, we send the topic name
         $location.path(route).search({
@@ -56,7 +56,7 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
     function redirectToTopic(postDataTitle) {
 
         var paramA = postDataTitle;
-        var route = '/topic/';
+        var route = 'topic';
 
         // this is the redirection to the edit-topic view, we send the topic name
         $location.path(route).search({
@@ -106,7 +106,7 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
     function redirectToEditTopic(postDataTitle) {
 
         var paramA = postDataTitle;
-        var route = '/editTopic/';
+        var route = 'editTopic';
 
         // this is the redirection to the edit-topic view, we send the topic name
         $location.path(route).search({
@@ -118,7 +118,7 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
     // also used i startController ---->>>> REDUNDANCE
     Api.User.get({
-        id: loggedInUser.userId
+        id: loggedInUser.getUserId()
     }, function(data) {
         console.log("Load current user data and his topics ...");
         $scope.user = data;
@@ -162,7 +162,7 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
         console.log(existsNot);
         return !existsNot;
-        // we should inform the user if he entered a topic title that already exists //todo
+        // we should inform the user if he entered a topic title that already e
 
     }
 

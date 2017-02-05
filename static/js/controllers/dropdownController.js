@@ -10,7 +10,7 @@ myApp.controller('DropdownCtrl', function($scope, UserObjectFactory, $location, 
 
             // also used i startController ---->>>> REDUNDANCE
          Api.User.get({
-        id: loggedInUser.userId
+        id: loggedInUser.getUserId()
      }, function(data) {
         console.log("Load current user data and his topics ...");
         $scope.user = data;
@@ -31,7 +31,7 @@ myApp.controller('DropdownCtrl', function($scope, UserObjectFactory, $location, 
         console.log("Lade Topic view with topic " + $scope.myDropDown);
 
         var paramA = $scope.myDropDown;
-        var route = '/topic/';
+        var route = 'topic';
 
 
         // this is the redirection to the topic-view, we send the name of the current topic
@@ -51,7 +51,7 @@ myApp.controller('DropdownCtrl', function($scope, UserObjectFactory, $location, 
             $scope.oldTopicTitle = "";
 
         var paramA = "";
-        var route = '/newTopic/';
+        var route = 'newTopic';
 
         // this is the redirection to the edit-topic view, we send the topic name
         $location.path(route).search({paramA: ""});

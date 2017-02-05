@@ -3,11 +3,14 @@
  */
 
 
-myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, loggedInUser) {
+myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, loggedInUser, UserObjectFactory) {
 
+    console.log("Eingeloggter Nutzer" + loggedInUser.getUserId());
+    $scope.user = {};
+    console.log($scope.user);
 
       Api.User.get({
-        id: loggedInUser.userId
+        id: loggedInUser.getUserId()
      }, function(data) {
                  console.log("Load current user data and his topics ...");
                  $scope.user = data;
@@ -30,7 +33,7 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
 
         var paramA = $scope.myDropDown;
-        var route = '/topic/';
+        var route = 'topic';
 
 
         // this is the redirection to the topic-view, we send the name of the current topic
@@ -53,7 +56,7 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
 
         var paramA = title;
-        var route = '/topic/';
+        var route = 'topic';
 
 
         // this is the redirection to the topic-view, we send the name of the current topic
@@ -76,7 +79,7 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
             $scope.iDsOfquerysForSelectedTopic = {};
             $scope.oldTopicTitle = "";*/
 
-        var route = '/newTopic';
+        var route = 'newTopic';
 
 
         // this is the redirection to the new-topic-form
