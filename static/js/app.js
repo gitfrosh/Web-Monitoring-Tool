@@ -36,13 +36,15 @@ myApp.factory('AuthService',
         // handle success
         .success(function (data, status) {
 
-          console.log("Success");
+          console.log("The user has entered data and a HTTP call was made...");
 
           if(status === 200 && data[0].result){
             user = true;
 
             loggedInUser.setUserId(data[1].userId);
-            console.log(loggedInUser.getUserId()); 
+
+            console.log("HTTP call 200 and verification okay.. we just set the loggedInUser-ID to .." +
+              loggedInUser.getUserId() + " and we set the user to" + user);
 
             deferred.resolve();
           } else {
@@ -74,7 +76,6 @@ myApp.factory('AuthService',
         .success(function (data) {
           user = false;
 
-          //console.log(UserObjectFactory.getUserId())
           deferred.resolve();
         })
         // handle error
@@ -118,19 +119,27 @@ myApp.factory('AuthService',
       // handle success
 
       .success(function (data) {
-           console.log("User Login Status Auth:" + isLoggedIn());
-           console.log("User Login Status: " + data.status);
 
-        if(data.status){
+           console.log("We just made the HTTP call and got the UserStatus: " + data[0].status + "and Id " + data[1].userId);
+
+        if(data[0].status){
           user = true;
+          loggedInUser.setUserId(data[1].userId);
+            
+
         } else {
           user = false;
         }
-      })
+      }
+
+
+      )
       // handle error
       .error(function (data) {
         user = false;
       });
+
+
     }
 
 
@@ -246,7 +255,7 @@ myApp.config(['$routeProvider',
 
 //////////////
 
-myApp.run(function ($rootScope, $location, $route, AuthService) {
+myApp.run(function ($rootScope, $location, $route, AuthService,  loggedInUser) {
 
     var restricted_c = false;
 
@@ -257,8 +266,8 @@ myApp.run(function ($rootScope, $location, $route, AuthService) {
         if (next['access']) {
             restricted_c = next.access.restricted;
             //restricted_n = next.access.restricted;
-            console.log("restricted: " + restricted_c);
-            console.log("Auth.logged " + AuthService.isLoggedIn());
+            console.log("OnRouteChangeStart: Oh! Loading a new Page! Is it restricted?: " + restricted_c);
+            //console.log("Auth.logged " + AuthService.isLoggedIn());
 
         }
        else restricted_c = true});
@@ -269,12 +278,10 @@ myApp.run(function ($rootScope, $location, $route, AuthService) {
   $rootScope.$on('$routeChangeStart',
     function ($timeout, $scope, event, next, current) {
 
-
-
       AuthService.getUserStatus()
       .then(function(){
         if (restricted_c && !AuthService.isLoggedIn()){
-            console.log("!!");
+            console.log("OnRouteChangeStart2: No user is logged in and page is restricted! .. we redirect to login ..");
 
             $scope.disabled = false;
             $scope.loginForm = {};
@@ -282,6 +289,10 @@ myApp.run(function ($rootScope, $location, $route, AuthService) {
             $location.path('/login');
 
             //$route.reload();
+        } else {
+
+            console.log("OnRouteChangeStart2: Oh! The requested page is probably not restricted OR the user is signed in well .. if ther" +
+                "e is a user logged in, the ID follows...  "+ loggedInUser.getUserId());
         }
       });
   });
@@ -294,48 +305,14 @@ myApp.run(function ($rootScope, $location, $route, AuthService) {
 
 
 
-myApp.controller('LoginCtrl',
-  ['$scope', '$location', '$timeout', '$window', '$rootScope', 'AuthService', 'UserObjectFactory', 'loggedInUser',
-  function ($scope, $location, $timeout, $window, $rootScope, AuthService, UserObjectFactory, loggedInUser) {
-
-    $scope.login = function () {
-
-      // initial values
-      $scope.error = false;
-      $scope.disabled = true;
-
-      // call login from service
-      AuthService.login($scope.loginForm.email, $scope.loginForm.password)
-        // handle success
-        .then(function () {
-          console.log("success");
-          //
-
-          $scope.disabled = false;
-          $scope.loginForm = {};
-
-          $window.location.href = "#";
-
-        })
-        // handle error
-        .catch(function () {
-          $scope.error = true;
-          $scope.errorMessage = "Invalid username and/or password";
-          $scope.disabled = false;
-          $scope.loginForm = {};
-        });
-
-    };
-
-}]);
 
 myApp.controller('UserLoginCtrl', function($scope, Api, loggedInUser) {
     // Get specific User, curently only used for Hello-Statement in top bar
-    Api.User.get({
-        id: loggedInUser.getUserId()
-    }, function(data) {
-        $scope.user = data;
-    });
+    // Api.User.get({
+    //     id: loggedInUser.getUserId()
+    // }, function(data) {
+    //     $scope.user = data;
+    // });
 
 });
 

@@ -14,6 +14,7 @@ import json
 class LogoutUser(Resource):
     def get(self):
         session.pop('logged_in', None)
+        session.pop('userId', None)
         return jsonify({'result': 'success'})
 
 
@@ -22,9 +23,14 @@ class UserStatus(Resource):
 
         if session.get('logged_in'):
             if session['logged_in']:
-                return jsonify({'status': True})
+                userId_sanitized = json.loads(json_util.dumps(session['userId']))
+                return jsonify({'status': True}, {'userId': userId_sanitized['$oid']})
+
+            #userId_sanitized['$oid']
+
         else:
-            return jsonify({'status': False})
+            return jsonify({'status': False}, {'userId': ""})
+
 
 class VerifyUser(Resource):
 
@@ -50,6 +56,7 @@ class VerifyUser(Resource):
             auth = (data['password'] == request_params['password'])
 
         if auth:
+            session['userId'] = json.loads(json_util.dumps(ObjectId(data['_id'])))
             session['logged_in'] = True
             status = True
             userId = ObjectId(data['_id'])

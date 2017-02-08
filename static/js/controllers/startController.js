@@ -7,7 +7,7 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
     console.log("Eingeloggter Nutzer" + loggedInUser.getUserId());
     $scope.user = {};
-    console.log($scope.user);
+    
 
       Api.User.get({
         id: loggedInUser.getUserId()
