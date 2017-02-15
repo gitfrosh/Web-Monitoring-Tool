@@ -6,146 +6,6 @@ var myApp = angular.module('myApp', [
     'sharedServices','testFactory','ngRoute', 'ngResource', 'angular.filter'
 ]);
 
-myApp.factory('AuthService',
-  ['$q', '$timeout', '$http', 'loggedInUser',
-  function ($q, $timeout, $http, loggedInUser) {
-
-    // create user variable
-    var user = false;
-
-    // return available functions for use in controllers
-    return ({
-      isLoggedIn: isLoggedIn,
-      login: login,
-      logout: logout,
-      register: register,
-      getUserStatus: getUserStatus
-    });
-
-    function isLoggedIn() {
-      return !!user;
-    }
-
-    function login(email, password) {
-
-      // create a new instance of deferred
-      var deferred = $q.defer();
-
-      // send a post request to the server
-      $http.post('/api/users/', {email: email, password: password})
-        // handle success
-        .success(function (data, status) {
-
-          console.log("The user has entered data and a HTTP call was made...");
-
-          if(status === 200 && data[0].result){
-            user = true;
-
-            loggedInUser.setUserId(data[1].userId);
-
-            console.log("HTTP call 200 and verification okay.. we just set the loggedInUser-ID to .." +
-              loggedInUser.getUserId() + " and we set the user to" + user);
-
-            deferred.resolve();
-          } else {
-            user = false;
-            deferred.reject();
-          }
-        })
-        // handle error
-        .error(function (data) {
-          user = false;
-          deferred.reject();
-        });
-
-      // return promise object
-      return deferred.promise;
-
-    }
-
-    function logout() {
-
-      loggedInUser.setUserId("");
-
-      // create a new instance of deferred
-      var deferred = $q.defer();
-
-      // send a get request to the server
-      $http.get('/api/logout/')
-        // handle success
-        .success(function (data) {
-          user = false;
-
-          deferred.resolve();
-        })
-        // handle error
-        .error(function (data) {
-          user = false;
-          deferred.reject();
-        });
-
-      // return promise object
-      return deferred.promise;
-
-    }
-
-    function register(email, password) {
-
-      // create a new instance of deferred
-      var deferred = $q.defer();
-
-      // send a post request to the server
-      $http.post('/api/register', {email: email, password: password})
-        // handle success
-        .success(function (data, status) {
-          if(status === 200 && data.result){
-            deferred.resolve();
-          } else {
-            deferred.reject();
-          }
-        })
-        // handle error
-        .error(function (data) {
-          deferred.reject();
-        });
-
-      // return promise object
-      return deferred.promise;
-
-    }
-
-    function getUserStatus() {
-      return $http.get('/api/status/')
-      // handle success
-
-      .success(function (data) {
-
-           console.log("We just made the HTTP call and got the UserStatus: " + data[0].status + "and Id " + data[1].userId);
-
-        if(data[0].status){
-          user = true;
-          loggedInUser.setUserId(data[1].userId);
-            
-
-        } else {
-          user = false;
-        }
-      }
-
-
-      )
-      // handle error
-      .error(function (data) {
-        user = false;
-      });
-
-
-    }
-
-
-
-
-}]);
 
 
 // ///////////////////////////////////////////////Constants
@@ -168,14 +28,6 @@ myApp.service('loggedInUser', function() {
 
 
 }});
-
-// myApp.value("loggedInUser", {
-//
-//     "userId": ""
-//
-//     //"userId": UserObjectFactory.getUserId()
-// });
-// ///////////////////////////////////////////////Values
 
 
 myApp.value('THROTTLE_MILLISECONDS', null);
@@ -253,7 +105,8 @@ myApp.config(['$routeProvider',
 ]);
 
 
-//////////////
+//////////////These functions detect route changes while app is running, e.g. reloading the page or changing the route
+// internally, this stuff is necessary to check the login status and shut out not logged in users
 
 myApp.run(function ($rootScope, $location, $route, AuthService,  loggedInUser) {
 
@@ -302,67 +155,3 @@ myApp.run(function ($rootScope, $location, $route, AuthService,  loggedInUser) {
 
 
 
-
-
-
-
-myApp.controller('UserLoginCtrl', function($scope, Api, loggedInUser) {
-    // Get specific User, curently only used for Hello-Statement in top bar
-    // Api.User.get({
-    //     id: loggedInUser.getUserId()
-    // }, function(data) {
-    //     $scope.user = data;
-    // });
-
-});
-
-myApp.controller('LogoutCtrl',
-  ['$scope', '$location', 'AuthService',
-  function ($scope, $location, AuthService) {
-
-         console.log("Try to log out..");
-      // call logout from service
-      AuthService.logout()
-        .then(function () {
-
-        var route = 'login';
-
-        $location.path(route);
-         // $window.location.href = "http://0.0.0.0:5000/dashboard/#/login";
-
-        });
-
-
-}]);
-
-
-myApp.controller('RegisterCtrl',
-  ['$scope', '$location', 'AuthService',
-  function ($scope, $location, AuthService) {
-
-    $scope.register = function () {
-
-      // initial values
-      $scope.error = false;
-      $scope.disabled = true;
-
-      // call register from service
-      AuthService.register($scope.registerForm.email,
-                           $scope.registerForm.password)
-        // handle success
-        .then(function () {
-          $location.path('login');
-          $scope.disabled = false;
-          $scope.registerForm = {};
-        })
-        // handle error
-        .catch(function () {
-          $scope.error = true;
-          $scope.errorMessage = "Something went wrong!";
-          $scope.disabled = false;
-          $scope.registerForm = {};
-        });
-
-    };
-
-}]);

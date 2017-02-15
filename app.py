@@ -20,7 +20,7 @@ from time import sleep
 import executor as executor
 import requests
 import schedule
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,  redirect
 
 from flask_pymongo import PyMongo
 
@@ -42,6 +42,11 @@ app.config["MONGO_DBNAME"] = "wmt-test"
 mongo = PyMongo(app, config_prefix='MONGO')
 
 # web app routing: only a few routes here, Angular does the rest
+
+@app.route('/')
+def redirectToDashboard():
+    return redirect("/dashboard/")
+
 @app.route('/dashboard/')
 def showIndex():
     return render_template('dashboard.html')
@@ -65,21 +70,21 @@ def showIndex():
 #     else:
 #         return jsonify({'status': False})
 
-@app.route('/api/register/', methods=['POST'])
-def register():
-    # json_data = request.json
-    # user = User(
-    #     email=json_data['email'],
-    #     password=json_data['password']
-    # )
-    # try:
-    #     db.session.add(user)
-    #     db.session.commit()
-    #     status = 'success'
-    # except:
-    #     status = 'this user is already registered'
-    # db.session.close()
-    return #jsonify({'result': status})
+# @app.route('/api/register/', methods=['POST'])
+# def register():
+#     # json_data = request.json
+#     # user = User(
+#     #     email=json_data['email'],
+#     #     password=json_data['password']
+#     # )
+#     # try:
+#     #     db.session.add(user)
+#     #     db.session.commit()
+#     #     status = 'success'
+#     # except:
+#     #     status = 'this user is already registered'
+#     # db.session.close()
+#     return #jsonify({'result': status})
 
 # special file handlers and error handlers
 @app.errorhandler(404)
@@ -121,6 +126,7 @@ myRestApi.add_resource(User, "/api/users/<string:userId>")  # rename in "user"
 
     # POST
 
+myRestApi.add_resource(NewUser, "/api/register/")
 myRestApi.add_resource(VerifyUser, "/api/users/")
 myRestApi.add_resource(LogoutUser, "/api/logout/")
 myRestApi.add_resource(UserStatus, "/api/status/")
@@ -185,7 +191,7 @@ if __name__ == "__main__":
     #schedule.every(30).seconds.do(run_every_10_seconds)
     t = Thread(target=run_schedule)
     t.start()
-    app.run(host='0.0.0.0',use_reloader=False, debug=True, threaded=True)
+    app.run(use_reloader=False, debug=True, threaded=True)
 
 
 

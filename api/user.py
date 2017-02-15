@@ -1,8 +1,11 @@
+import bcrypt
+import pymongo
 from bson import ObjectId
 from flask import json, jsonify, session
 from flask_restful import reqparse, abort, Api, Resource
 from bson import json_util, ObjectId
 import json
+from pymongo import errors
 
 
 #CRUD Operations:
@@ -10,6 +13,58 @@ import json
 #Read (GET)_- Get something
 #Update (PUT) - Change something
 #Delete (DELETE)- Remove something
+
+salt = bcrypt.gensalt()
+
+class NewUser(Resource):
+    def post(self):
+
+        from app import mongo
+        parser = reqparse.RequestParser()
+        parser.add_argument('email', type=str, required=True, help='No email activeness given',
+                            location='json')
+        parser.add_argument('name', type=str, required=True, help='No name given',
+                            location='json')
+        parser.add_argument('password', type=str, required=True, help='No pw given',
+                            location='json')
+        request_params = parser.parse_args()
+
+        result1 = ""
+        result2 = {}
+
+        try:
+
+            hashed = bcrypt.hashpw(request_params['password'].encode('utf8'), bcrypt.gensalt())
+
+
+            result1 = mongo.db.users.insert({
+                "email": request_params['email'],
+                "name": request_params['name'],
+                "password": hashed,
+                "sources": "",
+                "topics": []
+            })
+
+        except pymongo.errors.DuplicateKeyError as e:
+
+            result2['success'] = False
+            result2['error'] = ("This document's title already exists. Document was not inserted into db.")
+
+        # create an index everytime a new doc was inserted, to prevent duplicate entries regarding title!!
+        # we could prevent duplicate entries also through unify the url or other metadata..
+        result3 = mongo.db.documents.create_index([('title', pymongo.ASCENDING)], unique=True)
+
+        response = {
+            'result': True,
+            'result1': result1,
+            'result2': result2,
+            'result3': result3,
+            'error_code': 0
+        }
+
+        data_sanitized = json.loads(json_util.dumps(response))
+        return data_sanitized
+
 
 class LogoutUser(Resource):
     def get(self):
@@ -52,8 +107,11 @@ class VerifyUser(Resource):
 
         auth = False
 
+        #hashed_password = bcrypt.hashpw(password, salt)
+
         if data:
-            auth = (data['password'] == request_params['password'])
+            auth = bcrypt.checkpw(request_params['password'].encode('utf8'), data['password'])
+
 
         if auth:
             session['userId'] = json.loads(json_util.dumps(ObjectId(data['_id'])))
@@ -92,9 +150,8 @@ class User(Resource):
         # update user infos here
         return
 
-    def post(self):
-        # new user
-        return
+
+
 
 
 class AllUsers(Resource):

@@ -14,7 +14,7 @@
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="175">
+          <list size="180">
             <item index="0" class="java.lang.String" itemvalue="functools32" />
             <item index="1" class="java.lang.String" itemvalue="numba" />
             <item index="2" class="java.lang.String" itemvalue="greenlet" />
@@ -190,6 +190,11 @@
             <item index="172" class="java.lang.String" itemvalue="colorama" />
             <item index="173" class="java.lang.String" itemvalue="ply" />
             <item index="174" class="java.lang.String" itemvalue="openpyxl" />
+            <item index="175" class="java.lang.String" itemvalue="python-rake" />
+            <item index="176" class="java.lang.String" itemvalue="docopt" />
+            <item index="177" class="java.lang.String" itemvalue="yarg" />
+            <item index="178" class="java.lang.String" itemvalue="pipreqs" />
+            <item index="179" class="java.lang.String" itemvalue="pycrypto" />
           </list>
         </value>
       </option>
