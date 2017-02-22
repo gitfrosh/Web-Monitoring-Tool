@@ -3,7 +3,7 @@
 // ///////////////////////////////////////////////Module
 
 var myApp = angular.module('myApp', [
-    'sharedServices','testFactory','ngRoute', 'ngResource', 'angular.filter'
+    'sharedServices','testFactory','ngRoute', 'ng-fusioncharts', 'ngResource', 'angular.filter'
 ]);
 
 
@@ -28,10 +28,6 @@ myApp.service('loggedInUser', function() {
 
 
 }});
-
-
-myApp.value('THROTTLE_MILLISECONDS', null);
-
 
 // ///////////////////////////////////////////////Configuration
 

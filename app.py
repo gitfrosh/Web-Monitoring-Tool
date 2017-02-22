@@ -51,48 +51,10 @@ def redirectToDashboard():
 def showIndex():
     return render_template('dashboard.html')
 
-# @app.route('/home/')
-# def showLoginpage():
-#     return render_template('_home.html')
-
-
-# @app.route('/api/logout/')
-# def logout():
-#     session.pop('logged_in', None)
-#     return jsonify({'result': 'success'})
-
-
-# @app.route('/api/status/')
-# def status():
-#     if session.get('logged_in'):
-#         if session['logged_in']:
-#             return jsonify({'status': True})
-#     else:
-#         return jsonify({'status': False})
-
-# @app.route('/api/register/', methods=['POST'])
-# def register():
-#     # json_data = request.json
-#     # user = User(
-#     #     email=json_data['email'],
-#     #     password=json_data['password']
-#     # )
-#     # try:
-#     #     db.session.add(user)
-#     #     db.session.commit()
-#     #     status = 'success'
-#     # except:
-#     #     status = 'this user is already registered'
-#     # db.session.close()
-#     return #jsonify({'result': status})
-
 # special file handlers and error handlers
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
-
-
-##----------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -188,7 +150,7 @@ myRestApi.add_resource(DocumentbyIDSource, "/api/document/<string:documentId>/ne
 
 if __name__ == "__main__":
     app.secret_key = 'myKey'
-    #schedule.every(30).seconds.do(run_every_10_seconds)
+    #schedule.every(60).seconds.do(run_every_10_seconds)
     t = Thread(target=run_schedule)
     t.start()
     app.run(use_reloader=False, debug=True, threaded=True)

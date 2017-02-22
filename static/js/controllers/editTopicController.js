@@ -3,6 +3,8 @@
  */
 myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestFactory, $location, loggedInUser) {
 
+    $scope.tags = [ 'cool', 'awesome', 'angular', 'directive', 'javascript', 'html' ];
+
     var userId = loggedInUser.getUserId();
     $scope.myDropDown = $location.search().paramA;
     console.log($scope.myDropDown);
@@ -15,10 +17,10 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
 
 
-    ////////////////***************************************************************************Modal Stuff
+    //////////////// Modal Stuff
 
     $scope.showModal1 = false;
-    $scope.showModal3 = false; // distinction between only query updated and everything else???
+    $scope.showModal3 = false; // distinction between only query updated and everything else?
     $scope.showModal4 = false;
 
     $scope.hide = function(m, postDataTitle) {
@@ -50,8 +52,14 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
     };
 
 
+    $scope.removeQuery = function(queryId) {
 
-    //////////////////////***
+        console.log("Query should be deleted here .. " + queryId);
+        // todo
+        // delete Item from users' profile and set the query's status for this user to "false"
+
+    };
+
 
     function redirectToTopic(postDataTitle) {
 
@@ -66,11 +74,6 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
     }
 
     function loadQuerys() {
-
-        /////////////!!!DRY!!! also in editTopic/////////////////////////////////////////////////////////////////////
-
-
-        // now that we know the query IDs we must find the querys' objects
 
         $scope.queryObjects = [];
 
@@ -168,7 +171,8 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
     function dbAction() {
 
-        // THIS FUNCTION IS MONSTROUS!!!!!
+        // this function is monstrous,
+        // FIXME: this is lazy and error-prone
 
         $scope.oldTopicTitle = $scope.myDropDown;
         var postOldTitle = $scope.oldTopicTitle;
@@ -406,10 +410,55 @@ myApp.controller('EditTopicCtrl', function($scope, UserObjectFactory, Api, TestF
 
         });
 
+        // switch status of querys to false/true if topic activated / deactivated
+
         if ($scope.checkboxStatus.active == false) {
 
+                    // change status of querys to false if topic is deactivated!! //todo
+
+        for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
+
+                console.log($scope.iDsOfquerysForSelectedTopic[i].$oid);
+
+                var newQueryStatusData2 = {
+                            "query.status": false,
+                            "query.user": userId
+                        };
+
+                $scope.newQueryStatus = new Api.QuerybyIDStatus(newQueryStatusData2).$update({
+                            id: $scope.iDsOfquerysForSelectedTopic[i].$oid
+                        }).then(function() {
+                            console.log("Neuer Status gesendet..");
+                        });
+
+            }
+
+        } else if ($scope.checkboxStatus.active == true) {
+
+            console.log($scope.checkboxStatus.active);
+                       // change status of querys to false if topic is deactivated!! //todo
+
+         for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
+
+                console.log($scope.iDsOfquerysForSelectedTopic[i].$oid);
+
+                var newQueryStatusData2 = {
+                            "query.status": true,
+                            "query.user": userId
+                        };
+
+                $scope.newQueryStatus = new Api.QuerybyIDStatus(newQueryStatusData2).$update({
+                            id: $scope.iDsOfquerysForSelectedTopic[i].$oid
+                        }).then(function() {
+                            console.log("Neuer Status gesendet..");
+                        });
+
+            }
+
+            $scope.showModal3 = true;
+
         }
-        // change status of querys to false if topic is deactivated!! //todo
+
 
     }
 

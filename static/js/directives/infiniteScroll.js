@@ -2,8 +2,7 @@
  * Created by ulrike on 17.01.17.
  */
 
-angular.module('infiniteScroll', [])
-.directive('infiniteScroll', [
+myApp.directive('infiniteScroll', [
     '$rootScope', '$window', '$interval', 'THROTTLE_MILLISECONDS',
     function($rootScope, $window, $interval, THROTTLE_MILLISECONDS) {
         return {
@@ -184,5 +183,4 @@ angular.module('infiniteScroll', [])
     }
 ]);
 
-angular.module('infiniteScroll')
-      .value('THROTTLE_MILLISECONDS', null);
+myApp.value('THROTTLE_MILLISECONDS', null);
