@@ -8,7 +8,9 @@ Fourthly, we save the preprocessed data in the db
 
 import json
 import requests
+from flask import Flask, app
 from time import sleep
+from bson import json_util, ObjectId
 from preProcessor import preProcessing
 from app import conf
 

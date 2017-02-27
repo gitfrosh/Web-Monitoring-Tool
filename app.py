@@ -18,8 +18,9 @@ from time import sleep
 
 
 import executor as executor
+import requests
 import schedule
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, request, jsonify,  redirect
 
 
 from flask_pymongo import PyMongo
@@ -28,6 +29,7 @@ import newsApi
 from api.document import *
 from api.query import *
 from api.user import *
+from api.source import *
 
 import config as conf
 

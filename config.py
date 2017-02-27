@@ -17,7 +17,7 @@ MYRESTAPI_URL = 'http://0.0.0.0:5000/api'
 
 # PRODUCTION ENVIRONMENT HEROKU
 #MYRESTAPI_URL = 'http://wm-tool.herokuapp.com/api'
-mongo_db_uri = "mongodb://heroku_99b8pdxw:86gckmufoddor0so4hh24fs3fm@ds145009.mlab.com:45009/heroku_99b8pdxw"
+#mongo_db_uri = "mongodb://heroku_99b8pdxw:86gckmufoddor0so4hh24fs3fm@ds145009.mlab.com:45009/heroku_99b8pdxw"
 
 # only in DEVELOPMENT ENVIRONMENT
 CURSOR_DB = "db"
