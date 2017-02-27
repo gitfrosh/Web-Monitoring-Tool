@@ -1,3 +1,20 @@
+"""We set up the fetching of news documents here.
+First, we fetch all active querys for which documents shall be found.
+Secondly, we deliver them to the external API or APIs we want to ask for documents.
+Thirdly, we collect the found documents and transfer them to the PreProcessor, who will do important stuff
+Fourthly, we save the preprocessed data in the db
+
+"""
+
+import json
+import requests
+from flask import Flask, app
+from time import sleep
+from bson import json_util, ObjectId
+from preProcessor import preProcessing
+
+# newsAPI.py
+
 def collectDocuments():
 
     listOfactiveQuerys = []
@@ -18,3 +35,72 @@ def collectDocuments():
 
     else:
         print("No (active) querys to process!")
+
+def fetchQuerys(listOfactiveQuerys):
+    # fetch current querys entered by user
+    url = "http://0.0.0.0:5000/api/querys/" # hard-coded, not good
+    r = requests.get(url).json()
+
+    listOfactiveQueryIds = []
+
+    # check all querys for any active ones
+    for item in r['QUERYS']:
+        #print(item)
+        objectId = (item.get('_id'))['$oid']
+
+        for item2 in item['status']:
+            if item2['active'] == "True":
+               #listOfactiveQuerys.append(item.get('term', 0))
+               listOfactiveQuerys.append([item.get('term', 0), objectId])
+               #print(listOfactiveQueryIds)
+
+    return listOfactiveQuerys
+
+
+# this is another api which was tested but not implemented (newsapi.org
+# def requestNewsAPI(fetchedDocs):
+#     # set up API integration here for newsapi.org
+#     apiKey = "1c1211b562664037812900795a85b68c"
+#     url = 'https://newsapi.org/v1/articles?source=wired-de&sortBy=latest&apiKey='
+#
+#     r = requests.get(url + apiKey).json()
+#     fetchedDocs = r['articles']
+#     moreResultsCount =r['moreResultsAvailable']
+#
+#     print(moreResultsCount)
+#     print(fetchedDocs)
+#     return fetchedDocs
+
+
+
+def requestWebhose(query):
+    # set up Api integration for webhose.io
+    apiKey = app.config["WEBHOSE_APIKEY"]
+    url = "http://webhose.io/search?token="+apiKey+"&format=json&q=%22"+query+"%22%20language%3A(german)%20(site_type%3Anews)"#
+
+    r = requests.get(url).json()
+
+    fetchedDocs = r['posts']
+
+    print (fetchedDocs)
+    return fetchedDocs
+
+
+def saveDocs(preProcessedDocs):
+
+    print("Try to save preProcessed documents to db...")
+
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+
+    try:
+        for article in preProcessedDocs:
+            requests.post('http://0.0.0.0:5000/api/documents/', data=json.dumps(article), headers=headers)
+
+    except requests.exceptions.ConnectionError:
+
+        requests.status_code = "Connection refused"
+
+    sleep(2)
+    print("Documents were saved to db!")
+
+    return

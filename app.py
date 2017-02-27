@@ -11,16 +11,16 @@ requests from the frontend and moves them on to the MongoDB.
 
 Additionally we need to talk to external APIs where we fetch the actual documents. This is realized through "newsApi.py"
 and the PreProcessor."""
-
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
 from time import sleep
 
 
 import executor as executor
-import requests
 import schedule
-from flask import Flask, render_template, request, jsonify,  redirect
+from flask import Flask, render_template, redirect
+
 
 from flask_pymongo import PyMongo
 
@@ -28,19 +28,53 @@ import newsApi
 from api.document import *
 from api.query import *
 from api.user import *
-from api.source import *
+
+import config as conf
+
+
+
+def config_loader():
+
+    # Load configuration
+    try:  # configuration
+        app.config.from_pyfile('config.py')  # Load first in case we want to use in other config opt
+        app.logger.info('config file loaded successfully')
+    except IOError:
+        app.config['SECRET_KEY'] = 'secret_key'  # Default setting in case file does not exist yet
+        app.logger.warning('Secret config file not found, secret_key not found. Setting secret_key as default secret_key')
+
+
+#----------------------------------------------------------------------------------------------------------------------
+# Some configuration first
 
 app = Flask(__name__)
-
-# app.py
+config_loader()
 
 # initiate Thread and Executor
 executor = ThreadPoolExecutor(max_workers=10)
 
-# configure MongoDB and driver PyMongo
-app.config["MONGO_DBNAME"] = "wmt-test"
+# configure MongoDB and driver PyMongo (DEBUG / DEVELOPMENT ENVIRONMENT!!!!!)
 mongo = PyMongo(app, config_prefix='MONGO')
 
+# configure MongoDB and driver PyMongo (PRODUCTION ENVIRONMENT HEROKU!!!!!)
+#mongo = MongoClient(conf.mongo_db_uri)
+
+
+
+# periodic tasks
+def run_task():
+    print("Start periodic task!")
+    executor.submit(newsApi.collectDocuments)
+
+
+# schedule operation
+def run_schedule():
+    while 1:
+        schedule.run_pending()
+        sleep(1)
+
+
+#----------------------------------------------------------------------------------------------------------------------
 # web app routing: only a few routes here, Angular does the rest
 
 @app.route('/')
@@ -59,75 +93,41 @@ def page_not_found(e):
 
 
 ##----------------------------------------------------------------------------------------------------------------------
-# --> apiIntegration
-
-# periodic task
-def run_every_10_seconds():
-    print("Start periodic task!")
-    executor.submit(newsApi.collectDocuments)
-   # executor.submit(newsApi.fetchQuerys())
-    #executor.submit(newsApi.requestNewsAPI())
-
-# schedule operation
-def run_schedule():
-    while 1:
-        schedule.run_pending()
-        sleep(1)
+# apiIntegration
 
 
 myRestApi = Api(app)
 
 
-    ##################### user specific
-
-    # GET
-
+#user specific
 
 myRestApi.add_resource(AllUsers, "/api/users/")
 myRestApi.add_resource(User, "/api/users/<string:userId>")  # rename in "user"
-
-    # POST
 
 myRestApi.add_resource(NewUser, "/api/register/")
 myRestApi.add_resource(VerifyUser, "/api/users/")
 myRestApi.add_resource(LogoutUser, "/api/logout/")
 myRestApi.add_resource(UserStatus, "/api/status/")
 
-    # DELETE
-    # we don't need for now
-
-    # PUT
-    # update user's data
-    # create/delete new topics and querys
 myRestApi.add_resource(UserbyIDNewQuery, "/api/user/<string:userId>/newQuery")
-    # restApi.add_resource(UserbyIDDeleteQuery, "/api/user/<string:userId>/deleteQuery") #todo
-    # create or edit topic
+# restApi.add_resource(UserbyIDDeleteQuery, "/api/user/<string:userId>/deleteQuery") #todo
+
 myRestApi.add_resource(UserbyIdTopic, "/api/user/<string:userId>/topic")
 
-    #################### query specific
+# query specific
 
-    # POST
-    # new query (when topic is created in user's data)
 myRestApi.add_resource(NewQuery, "/api/querys")
 
-    # GET
 myRestApi.add_resource(AllQuerys, "/api/querys/")
 myRestApi.add_resource(Query, "/api/query/<string:queryId>")
 
-    # DELETE
-    # we don't need for now
-
-    # PUT
-    # update querys
 myRestApi.add_resource(QuerybyIDStatus, "/api/query/<string:queryId>/newStatus")
 
-    #################### document specific
+# document specific
 
-    # POST
     # web monitoring backend API
 myRestApi.add_resource(NewDocument, "/api/documents/")
 
-    # GET
 myRestApi.add_resource(AllDocuments, "/api/documents/")
 myRestApi.add_resource(DocumentsByQuery, "/api/documents/<string:queryId>")  # rename in api/documents/querys/
 myRestApi.add_resource(DocumentbyID, "/api/document/<string:documentId>")
@@ -135,25 +135,26 @@ myRestApi.add_resource(DocumentbyID, "/api/document/<string:documentId>")
     # PUT # will also be used to delete data parts like bookmarks, comments, ... # todo
 myRestApi.add_resource(DocumentbyIDUserComment, "/api/document/<string:documentId>/newComment")
 myRestApi.add_resource(DocumentbyIDUserBookmark, "/api/document/<string:documentId>/newBookmark")
-myRestApi.add_resource(DocumentbyIDUserTag, "/api/document/<string:documentId>/newUserTag")  # not yet used #todo
+myRestApi.add_resource(DocumentbyIDUserTag, "/api/document/<string:documentId>/newUserTag")
 myRestApi.add_resource(DocumentbyIDSource, "/api/document/<string:documentId>/newSource")  # not yet used
 
     # DELETE (we don't need, documents won't be deleted)
 
-    #################### sources specific
+# sources specific
+# this is very low priority! .. not yet implemented..
 
-    # this is very low priority!
 
 #----------------------------------------------------------------------------------------------------------------------
-
 # STARTS THE SERVER!
 
 if __name__ == "__main__":
-    app.secret_key = 'myKey'
-    #schedule.every(60).seconds.do(run_every_10_seconds)
+
+
+    schedule.every(43200).seconds.do(run_task)
     t = Thread(target=run_schedule)
     t.start()
-    app.run(use_reloader=False, debug=True, threaded=True)
+    app.run()
+
 
 
 

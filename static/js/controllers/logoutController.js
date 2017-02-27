@@ -14,7 +14,6 @@ myApp.controller('LogoutCtrl',
         var route = 'login';
 
         $location.path(route);
-         // $window.location.href = "http://0.0.0.0:5000/dashboard/#/login";
 
         });
 

@@ -8,11 +8,9 @@ Fourthly, we save the preprocessed data in the db
 
 import json
 import requests
-from flask import Flask
 from time import sleep
-from bson import json_util, ObjectId
 from preProcessor import preProcessing
-
+from app import conf
 
 def collectDocuments():
 
@@ -37,7 +35,7 @@ def collectDocuments():
 
 def fetchQuerys(listOfactiveQuerys):
     # fetch current querys entered by user
-    url = "http://0.0.0.0:5000/api/querys/"
+    url = conf.MYRESTAPI_URL + "/querys/"
     r = requests.get(url).json()
 
     listOfactiveQueryIds = []
@@ -56,24 +54,28 @@ def fetchQuerys(listOfactiveQuerys):
     return listOfactiveQuerys
 
 
-def requestNewsAPI(fetchedDocs):
-    # set up API integration here for newsapi.org
-    apiKey = "1c1211b562664037812900795a85b68c"
-    url = 'https://newsapi.org/v1/articles?source=wired-de&sortBy=latest&apiKey='
-
-    r = requests.get(url + apiKey).json()
-    fetchedDocs = r['articles']
-    moreResultsCount =r['moreResultsAvailable']
-
-    print(moreResultsCount)
-    print(fetchedDocs)
-    return fetchedDocs
+# this is another api which was tested but not implemented (newsapi.org
+# def requestNewsAPI(fetchedDocs):
+#     # set up API integration here for newsapi.org
+#     apiKey = "1c1211b562664037812900795a85b68c"
+#     url = 'https://newsapi.org/v1/articles?source=wired-de&sortBy=latest&apiKey='
+#
+#     r = requests.get(url + apiKey).json()
+#     fetchedDocs = r['articles']
+#     moreResultsCount =r['moreResultsAvailable']
+#
+#     print(moreResultsCount)
+#     print(fetchedDocs)
+#     return fetchedDocs
 
 
 
 def requestWebhose(query):
     # set up Api integration for webhose.io
-    apiKey = "99105d4f-bdaa-4ae6-8944-be95bf482266"
+    apiKey = conf.WEBHOSE_APIKEY
+    print(apiKey)
+
+
     url = "http://webhose.io/search?token="+apiKey+"&format=json&q=%22"+query+"%22%20language%3A(german)%20(site_type%3Anews)"#
 
 
@@ -87,23 +89,20 @@ def requestWebhose(query):
 
 
 def saveDocs(preProcessedDocs):
-    from app import mongo
 
     print("Try to save preProcessed documents to db...")
-
-    # it should be checked if a document with the same URL already exists (Duplicate!) #todo
 
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
     try:
         for article in preProcessedDocs:
-            requests.post('http://0.0.0.0:5000/api/documents/', data=json.dumps(article), headers=headers)
+            requests.post(conf.MYRESTAPI_URL +'/documents/', data=json.dumps(article), headers=headers)
 
     except requests.exceptions.ConnectionError:
 
         requests.status_code = "Connection refused"
 
-    sleep(10)
-    print("Task is done!")
+    sleep(2)
+    print("Documents were saved to db!")
 
     return

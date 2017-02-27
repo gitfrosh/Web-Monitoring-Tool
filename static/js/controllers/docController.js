@@ -11,6 +11,12 @@ myApp.controller('DocumentCtrl', ['$scope', '$routeParams', 'Api', '$location', 
 
     var userId = loggedInUser.getUserId();
 
+    Api.User.get({
+        id: loggedInUser.getUserId()
+    }, function(data) {
+        $scope.user = data;
+    });
+
     // set the comment area off when loading the page
     $scope.commentAreaToggledOn = [];
     $scope.commentAreaToggledOn.status = false;

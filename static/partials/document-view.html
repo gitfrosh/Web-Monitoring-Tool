@@ -9,15 +9,15 @@
         <div class="col-md-12 panel panel-blue panel-widget">
 
             <div class="widget-right">
-                          <button ng-click="" type="button" class="btn btn-md btn-primary">
+                          <!--<button ng-click="" type="button" class="btn btn-md btn-primary">
                         <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> {{item}}
-                    </button>
+                    </button>-->
                <button ng-click="switchToTopicview()" type="button" class="btn btn-md btn-primary">
-                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> {{item}}
+                        <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> {{item}}  Zurück zur Themenansicht
                     </button>
-                <button ng-click="" type="button" class="btn btn-md btn-primary">
+                <!--<button ng-click="" type="button" class="btn btn-md btn-primary">
                         <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span> {{item}}
-                    </button>
+                    </button>-->
             </div>
         </div>
 
@@ -30,7 +30,9 @@
             <div class="panel panel-default">
                 <div class="panel-heading">{{document.DOCUMENT.title}}</div>
                 <div class="panel-body">
-                    <p style="font-size: small">{{document.DOCUMENT.date}}</p>
+                    <p style="font-size: small">Datum: {{document.DOCUMENT.date}}</p>
+
+                    <i>Vorschautext</i><br><br>
 
                  {{document.DOCUMENT.abstract}}
 
@@ -44,13 +46,13 @@
        <div class="row">
         <div class="col-md-8">
             <div class="panel panel-default">
-                <div class="panel-heading">Tags</div>
+                <div class="panel-heading">Automatisch vergebene und eigene Tags</div>
                 <div class="panel-body">
 
-                    <button ng-repeat="item in document.DOCUMENT.tags_system track by $index" ng-click="" type="button" class="btn btn-md btn-primary btn-rounded">
+                    <button title="Automatisch vergebener Tag" ng-repeat="item in document.DOCUMENT.tags_system track by $index" ng-click="" type="button" class="btn btn-md btn-primary btn-rounded">
                         <span class="glyphicon glyphicon-tag" aria-hidden="true"></span> {{item}}
                     </button>
-                   <button ng-repeat="item in userTags track by $index" ng-click="" type="button" class="btn btn-md btn-default btn-rounded">
+                   <button title="Nutzer-Tag" ng-repeat="item in userTags track by $index" ng-click="" type="button" class="btn btn-md btn-default btn-rounded">
                         <span class="glyphicon glyphicon-tag" aria-hidden="true"></span> {{item}}
                     </button>
 
@@ -61,7 +63,7 @@
 
            <div class="col-lg-4">
             <div class="panel panel-default">
-                <div class="panel-heading">New Tag</div>
+                <div class="panel-heading">Neuer Tag</div>
                 <div class="panel-body">
                 <form name="tagForm" ng-submit="submitTagForm()">
                          <div class="form-group">
@@ -88,23 +90,23 @@
                 <div class="panel-heading">Tools</div>
                 <div class="panel-body">
 
-                    <button ng-if="userBookmark.status == true" ng-click="changeBookmark();" type="button" class="btn btn-lg btn-default">
+                    <button title="Dokument markieren" ng-if="userBookmark.status == true" ng-click="changeBookmark();" type="button" class="btn btn-lg btn-default">
                         <span class="glyphicon glyphicon-star" style="color: red" aria-hidden="true"></span>
                     </button>
 
-                    <button ng-if="userBookmark.status == false" ng-click="changeBookmark();" type="button" class="btn btn-lg btn-default">
+                    <button title="Dokument nicht mehr markieren" ng-if="userBookmark.status == false" ng-click="changeBookmark();" type="button" class="btn btn-lg btn-default">
                         <span class="glyphicon glyphicon-star-empty" aria-hidden="true"></span>
                     </button>
 
 
-                    <button ng-click="" type="button" class="btn btn-lg btn-default">
+                    <button title="Dokument teilen .." type="button" class="btn btn-lg btn-default">
                         <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
                     </button>
-                     <a href="{{document.DOCUMENT.url}}" target="_blank"><button type="button" class="btn btn-lg btn-default">
+                     <a href="{{document.DOCUMENT.url}}" target="_blank"><button title="Zum Volltext .." type="button" class="btn btn-lg btn-default">
                         <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
                     </button></a>
 
-                     <button ng-click="toggleCommentArea();" class="btn btn-default btn-lg btn-link" >
+                     <button title="Dokument kommentieren" ng-click="toggleCommentArea();" class="btn btn-default btn-lg btn-link" >
                         <span class="glyphicon glyphicon-comment"></span>
                             </button><span class="badge badge-notify">{{userComments.length}}</span>
 
@@ -158,7 +160,6 @@
 
 
                     </div>
-
 
 
 

@@ -1,11 +1,13 @@
-"""The PreProcessor cleans, transforms and extracts data from the raw data (fetchedDocs) bevor it saves the
-preprocessed documents into MongoDb.
+"""The PreProcessor cleans, transforms and extracts data from the raw data (fetchedDocs)
+THIS IS ONLY WORKING FOR webhose.io DATA!!
 """
 import rakeNLP
 
 
 
 def preProcessing(fetchedDocs, query):
+    """ all the preprocessing steps here...
+        """
     print("Preprocessing documents...")
 
     for doc in fetchedDocs:
@@ -24,6 +26,8 @@ def preProcessing(fetchedDocs, query):
     return fetchedDocs
 
 def deleteUnusedMetadata(doc):
+    """ delete unnessecary metadata: metadata we dont' need but is sent via external api
+        """
     print ("Delete unused Metadata...")
 
     keys = ['external_links','thread','highlightTitle','uuid','language','ord_in_thread','entities','highlightText','rating',
@@ -37,13 +41,17 @@ def deleteUnusedMetadata(doc):
 
 
 def chopAbstract(doc):
+    """ abstracts shouldn't bear more than 2000 characters
+        """
     print("Chop abstract...")
 
     doc['abstract'] = doc['abstract'][0:2000]
-    # abstracts shouldn't bear more than 2000 characters
+
     return doc
 
 def addQuery(doc, query):
+    """ add query id, so that we know via which query specific document was found
+    """
     print("Add query...")
     doc['query'] = query
     return doc
@@ -73,6 +81,8 @@ def extractTags(doc):
 
 
 def changeKeys(doc):
+    """there are some keys that we need to change..
+    """
     print("Change keys...")
 
     doc['publishedAt'] = doc.pop('published')

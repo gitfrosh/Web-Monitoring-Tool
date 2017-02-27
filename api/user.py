@@ -1,25 +1,21 @@
 import bcrypt
 import pymongo
-from bson import ObjectId
 from flask import json, jsonify, session
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import reqparse, Resource
 from bson import json_util, ObjectId
 import json
 from pymongo import errors
 
+coll_u = "users"
+coll_d ="documents"
 
-#CRUD Operations:
-#Create (POST) - Make something
-#Read (GET)_- Get something
-#Update (PUT) - Change something
-#Delete (DELETE)- Remove something
-
+# user password encrypt stuff
 salt = bcrypt.gensalt()
 
 class NewUser(Resource):
     def post(self):
 
-        from app import mongo
+        from app import mongo, conf
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, required=True, help='No email activeness given',
                             location='json')
@@ -37,7 +33,7 @@ class NewUser(Resource):
             hashed = bcrypt.hashpw(request_params['password'].encode('utf8'), bcrypt.gensalt())
 
 
-            result1 = mongo.db.users.insert({
+            result1 = getattr(getattr(mongo, conf.CURSOR_DB), coll_u).insert({
                 "email": request_params['email'],
                 "name": request_params['name'],
                 "password": hashed,
@@ -52,7 +48,7 @@ class NewUser(Resource):
 
         # create an index everytime a new doc was inserted, to prevent duplicate entries regarding title!!
         # we could prevent duplicate entries also through unify the url or other metadata..
-        result3 = mongo.db.documents.create_index([('title', pymongo.ASCENDING)], unique=True)
+        result3 = getattr(getattr(mongo, conf.CURSOR_DB), coll_d).create_index([('title', pymongo.ASCENDING)], unique=True)
 
         response = {
             'result': True,
@@ -90,7 +86,7 @@ class UserStatus(Resource):
 class VerifyUser(Resource):
 
     def post(self):
-        from app import mongo
+        from app import mongo, conf
 
         parser = reqparse.RequestParser()
         parser.add_argument('email', type=str, required=True, help='No email given',
@@ -103,7 +99,7 @@ class VerifyUser(Resource):
         data = {}
         userId = ""
 
-        data = mongo.db.users.find_one({'email': request_params['email']})
+        data = getattr(getattr(mongo, conf.CURSOR_DB), coll_u).find_one({'email': request_params['email']})
 
         auth = False
 
@@ -133,11 +129,11 @@ class User(Resource):
 
     def get(self, userId):
 
-        from app import mongo
+        from app import mongo, conf
 
         # we must "sanitize" the returned BSON when jsonifying it, because otherwise there will be a TypeError due to
         # the ObjectIds!
-        data = mongo.db.users.find_one({'_id': ObjectId(userId)})
+        data = getattr(getattr(mongo, conf.CURSOR_DB), coll_u).find_one({'_id': ObjectId(userId)})
         data_sanitized = json.loads(json_util.dumps(data))
 
         return ({"USER": data_sanitized})
@@ -159,10 +155,10 @@ class AllUsers(Resource):
 
     def get(self):
         data = []
-        from app import mongo
+        from app import mongo, conf
 
 
-        cursor = mongo.db.users.find({})#.limit(10)
+        cursor = getattr(getattr(mongo, conf.CURSOR_DB), coll_u).find({})#.limit(10)
 
         for user in cursor:
             data.append(user)
@@ -175,7 +171,7 @@ class UserbyIDNewQuery(Resource):
 
     def put(self, userId):
 
-        from app import mongo
+        from app import mongo, conf
 
         parser = reqparse.RequestParser()
         parser.add_argument('query.id', type=str, required=True, help='No query id given',
@@ -184,10 +180,7 @@ class UserbyIDNewQuery(Resource):
                             location='json')
         request_params = parser.parse_args()
 
-        #result = mongo.db.users.update({'_id': ObjectId(userId), "topics.title": request_params['topic.title']}, {
-        #    '$push': {"topics.$.querys": {ObjectId(request_params['query.id'])}}})
-
-        result = mongo.db.users.update(
+        result = getattr(getattr(mongo, conf.CURSOR_DB), coll_u).update(
             {'_id': ObjectId(userId), "topics.title": request_params['topic.title']},
             {"$push":
                 {"topics.$.querys":
@@ -210,7 +203,7 @@ class UserbyIdTopic(Resource):
 
     def put(self, userId):
 
-        from app import mongo
+        from app import mongo, conf
         parser = reqparse.RequestParser()
         parser.add_argument('topic.status', type=str, required=True, help='No topic status given',
                             location='json')
@@ -229,20 +222,18 @@ class UserbyIdTopic(Resource):
         # unfortunately, we have to do two requests here: one, to delete ("pull") the existing topic for a specific user
         # the second to add/rea-dd (push) the topic, the user has just created/modified
 
-        result1 = mongo.db.users.update({'_id': ObjectId(userId)},
+        result1 = getattr(getattr(mongo, conf.CURSOR_DB), coll_u).update({'_id': ObjectId(userId)},
                                             {'$pull': {'topics': {'title': request_params['oldtopic.title']}}})
-        result2 = mongo.db.users.update({'_id': ObjectId(userId)}, {
+        result2 = getattr(getattr(mongo, conf.CURSOR_DB), coll_u).update({'_id': ObjectId(userId)}, {
             '$push': {"topics": {"active": request_params['topic.status'], "collaboration": request_params['topic.collaboration'],
                                  "owner": ObjectId(request_params['topic.owner']), "querys": [], "title": request_params['topic.title']}}},
                                             upsert=True)
-        #result3 = mongo.db.users.update({'_id': ObjectId(userId), "topics.title": request_params['topic.title']}, {
-        #    '$push': {"topics.$.querys": request_params['topic.querys']}},
-        #                               upsert=True)
+
 
         response = {
             'result1': result1,
             'result2': result2,
-          #  'result3': result3,
+
             'error_code': 0
         }
 

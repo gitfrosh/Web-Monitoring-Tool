@@ -1,26 +1,18 @@
-from bson import ObjectId
+
 from flask import json, jsonify
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import reqparse, Resource
 from bson import json_util, ObjectId
 import json
 
-#CRUD Operations:
-#Create (POST) - Make something
-#Read (GET)_- Get something
-#Update (PUT) - Change something
-#Delete (DELETE)- Remove something
-
-# have the API return the updated (or created) representation as part of the response.
-# In case of a POST that resulted in a creation, use a HTTP 201 status code and include a Location header
-# that points to the URL of the new resource.
+coll = "querys"
 
 class Query(Resource):
 
     def get(self, queryId):
         data = []
-        from app import mongo
+        from app import mongo, conf
 
-        data = mongo.db.querys.find_one({'_id': ObjectId(queryId)})
+        data = getattr(getattr(mongo, conf.CURSOR_DB), coll).find_one({'_id': ObjectId(queryId)})
         data_sanitized = json.loads(json_util.dumps(data))
 
         return ({"QUERY": data_sanitized})
@@ -31,7 +23,7 @@ class Query(Resource):
 class NewQuery(Resource):
 
     def post(self):
-        from app import mongo
+        from app import mongo, conf
         parser = reqparse.RequestParser()
         parser.add_argument('status.active', type=str, required=True, help='No status activeness given',
                             location='json')
@@ -44,7 +36,7 @@ class NewQuery(Resource):
         request_params = parser.parse_args()
         # result = process_the_request(request_params)
 
-        result = mongo.db.querys.insert({
+        result = getattr(getattr(mongo, conf.CURSOR_DB), coll).insert({
                         "status": [
                                  {
                                     "active": request_params['status.active'],
@@ -67,9 +59,9 @@ class AllQuerys(Resource):
 
     def get(self):
         data = []
-        from app import mongo
+        from app import mongo, conf
 
-        cursor = mongo.db.querys.find({})
+        cursor = getattr(getattr(mongo, conf.CURSOR_DB), coll).find({})
 
         for query in cursor:
             data.append(query)
@@ -81,7 +73,7 @@ class AllQuerys(Resource):
 class QuerybyIDStatus(Resource):
 
     def put(self, queryId):
-        from app import mongo
+        from app import mongo, conf
 
         parser = reqparse.RequestParser()
         parser.add_argument('query.status', type=str, required=True, help='No query status given',
@@ -90,10 +82,10 @@ class QuerybyIDStatus(Resource):
                             location='json')
         request_params = parser.parse_args()
 
-        result1 = mongo.db.querys.update({'_id': ObjectId(queryId)},
+        result1 = getattr(getattr(mongo, conf.CURSOR_DB), coll).update({'_id': ObjectId(queryId)},
                                         {'$pull': {'status': {'user': ObjectId(request_params['query.user'])}}})
 
-        result2 = mongo.db.querys.update({'_id': ObjectId(queryId)}, {
+        result2 = getattr(getattr(mongo, conf.CURSOR_DB), coll).update({'_id': ObjectId(queryId)}, {
            '$push': {"status": {"user": ObjectId(request_params['query.user']), "active": request_params['query.status']}}}, upsert=True)
 
         response = {

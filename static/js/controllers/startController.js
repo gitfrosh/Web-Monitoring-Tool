@@ -28,9 +28,6 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
         console.log("Lade Topic view with topic " + $scope.myDropDown);
 
-/*        $scope.addTopicStatus = false;
-        $scope.editTopicStatus = false;*/
-
 
         var paramA = $scope.myDropDown;
         var route = 'topic';
@@ -38,9 +35,6 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
         // this is the redirection to the topic-view, we send the name of the current topic
         $location.path(route).search({paramA: $scope.myDropDown});
-
-
-        //loadQuerys();
 
 
     };
@@ -51,9 +45,6 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
         console.log("Lade Topic view with topic " + title);
 
-/*        $scope.addTopicStatus = false;
-        $scope.editTopicStatus = false;*/
-
 
         var paramA = title;
         var route = 'topic';
@@ -61,9 +52,6 @@ myApp.controller('StartCtrl', function($scope, Api, TestFactory, $location, logg
 
         // this is the redirection to the topic-view, we send the name of the current topic
         $location.path(route).search({paramA: title});
-
-
-        //loadQuerys();
 
 
     };

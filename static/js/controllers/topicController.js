@@ -19,7 +19,6 @@ myApp.controller('TopicCtrl', function($scope, $q, Api, QueryObjectFactory, User
     $scope.selectedTopic = {};
     $scope.selectedTopic.querys = [];
     $scope.documentCollection = [];
-    $scope.documentCollection.empty = false;
 
     // stuff to handle the documents' table: sort, search
     $scope.sortType = 'date'; // set the default sort type
@@ -78,53 +77,6 @@ myApp.controller('TopicCtrl', function($scope, $q, Api, QueryObjectFactory, User
 
     }
 
-    function loadChart() {
-
-        // this stuff will only work with webhose's data! example data!
-
-        for (var i = 0, l = $scope.documentCollection.length; i < l; i++) {
-
-            $scope.documentCollection[i].date = $scope.documentCollection[i].date.slice(0, 10);
-
-        }
-
-        var sortedDocCollection = _.sortBy($scope.documentCollection, 'date');
-
-
-
-        var counter = {};
-        for (var i = 0; i < sortedDocCollection.length; i += 1) {
-            counter[sortedDocCollection[i].date] = (counter[sortedDocCollection[i].date] || 0) + 1;
-        }
-
-        console.log(counter);
-
-
-        for (var key in counter) {
-
-            //console.log($scope.chartData);
-
-            var tempObj = {};
-            // (counter[key] > 1) {
-            //console.log(key, " counter ", counter[key]);
-
-            //tempObj.push(key, counter[key]);
-            tempObj['label'] = key;
-            tempObj['value'] = counter[key];
-            $scope.chartData.push(tempObj);
-            //}
-            //console.log(tempObj);
-            //console.log($scope.chartData);
-
-        }
-        // we should cut the chartData to 5 to 10 days into the past ...
-
-        // $scope.chartData = $scope.chartData.slice(-5); does not work
-        console.log($scope.chartData);
-
-
-
-    }
 
 
 
@@ -242,13 +194,62 @@ myApp.controller('TopicCtrl', function($scope, $q, Api, QueryObjectFactory, User
 
         } else {
             console.log("There are no querys/documents that can be retrieved");
-            $scope.documentCollection.empty = false;
+
         }
 
 
 
 
     }
+
+    function loadChart() {
+
+        // this stuff will only work with webhose's data! example data!
+
+        for (var i = 0, l = $scope.documentCollection.length; i < l; i++) {
+
+            $scope.documentCollection[i].date = $scope.documentCollection[i].date.slice(0, 10);
+
+        }
+
+        var sortedDocCollection = _.sortBy($scope.documentCollection, 'date');
+
+
+
+        var counter = {};
+        for (var i = 0; i < sortedDocCollection.length; i += 1) {
+            counter[sortedDocCollection[i].date] = (counter[sortedDocCollection[i].date] || 0) + 1;
+        }
+
+        console.log(counter);
+
+
+        for (var key in counter) {
+
+            //console.log($scope.chartData);
+
+            var tempObj = {};
+            // (counter[key] > 1) {
+            //console.log(key, " counter ", counter[key]);
+
+            //tempObj.push(key, counter[key]);
+            tempObj['label'] = key;
+            tempObj['value'] = counter[key];
+            $scope.chartData.push(tempObj);
+            //}
+            //console.log(tempObj);
+            //console.log($scope.chartData);
+
+        }
+        // we should cut the chartData to 5 to 10 days into the past ...
+
+        // $scope.chartData = $scope.chartData.slice(-5); does not work
+        console.log($scope.chartData);
+
+
+
+    }
+
 
 
     function loadOnlyBookmarked() {
@@ -258,7 +259,7 @@ myApp.controller('TopicCtrl', function($scope, $q, Api, QueryObjectFactory, User
         // start a fresh documentCollection for our output table
         $scope.rawDocumentCollection = [];
         $scope.documentCollection = [];
-        $scope.documentCollection.empty = false;
+
 
 
         for (var i = 0, l = $scope.iDsOfquerysForSelectedTopic.length; i < l; i++) {
@@ -297,12 +298,12 @@ myApp.controller('TopicCtrl', function($scope, $q, Api, QueryObjectFactory, User
                             $scope.documentCollection.push($scope.rawDocumentCollection[i]);
                             console.log($scope.rawDocumentCollection[i]);
                             console.log($scope.documentCollection);
-                            $scope.documentCollection.empty = false;
+
 
 
                         } else {
-                            console.log("Dieses Dokument hat keine Bookmarks.");
-                            //$scope.documentCollection.empty = true; does not really work //todo
+                            console.log("Es gibt keine Dokumente, die gebookmarked wurden.");
+
 
                         }
 
@@ -368,6 +369,8 @@ myApp.controller('TopicCtrl', function($scope, $q, Api, QueryObjectFactory, User
         })
     };
 
+    // this handles the trend radar grafic
+
     $scope.myDataSource =
 
 
@@ -377,7 +380,7 @@ myApp.controller('TopicCtrl', function($scope, $q, Api, QueryObjectFactory, User
                 "theme": "fint",
 
                 "caption": "Gefundene Dokumente im Themenfeld " + $scope.myDropDown,
-                "subCaption": ".. in den vergangenen zehn Tagen",
+                "subCaption": "..",
                 "xAxisName": "Datum",
                 "yAxisName": "Anzahl der Dokumente",
                 "paletteColors": "#0075c2",

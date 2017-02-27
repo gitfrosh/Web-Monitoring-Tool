@@ -64,6 +64,14 @@ myApp.config(['$routeProvider',
             templateUrl: '../static/partials/newsletter.html',
             access: {restricted: true}
         }).
+            when('/search', {
+            templateUrl: '../static/partials/search.html',
+            access: {restricted: true}
+        }).
+            when('/help', {
+            templateUrl: '../static/partials/help.html',
+            access: {restricted: true}
+        }).
         when('/userconfig', {
             templateUrl: '../static/partials/user-config.html',
             access: {restricted: true}
@@ -81,10 +89,6 @@ myApp.config(['$routeProvider',
             controller: 'LogoutCtrl',
             templateUrl: '../static/partials/login.html',
             access: {restricted: false}
-        }).
-        when('/search', {
-            templateUrl: '../static/partials/user-sources.html',
-            access: {restricted: true}
         }).
         when('/register', {
             templateUrl: '../static/partials/register.html',

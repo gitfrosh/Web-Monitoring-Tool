@@ -1,42 +1,29 @@
 #api/document.py
+
 import pymongo
-from bson import ObjectId
-from flask import json, jsonify
-from flask_restful import reqparse, abort, Api, Resource
+from flask import json
+from flask_restful import reqparse, Resource
 from bson import json_util, ObjectId
 import json
 from pymongo import errors
 
+coll = "documents"
 
-#CRUD Operations:
-#Create (POST) - Make something
-#Read (GET)_- Get something
-#Update (PUT) - Change something
-#Delete (DELETE)- Remove something
-
-# have the API return the updated (or created) representation as part of the response.
-# In case of a POST that resulted in a creation, use a HTTP 201 status code and include a Location header
-# that points to the URL of the new resource.
 
 class AllDocuments(Resource):
 
     # get ALL documents # only for dev purposes
     def get(self):
+        from app import mongo, conf
+
         data = []
 
-        from app import mongo
-
-        cursor = mongo.db.documents.find({})
+        cursor = getattr(getattr(mongo, conf.CURSOR_DB), coll).find({})
 
         for document in cursor:
             data.append(document)
 
         return json.loads(json_util.dumps({"DOCUMENTS": data}))
-
-    # add documents (this is the actual web monitoring flow
-    def post(self):
-         # do something
-         return
 
 class DocumentsByQuery(Resource):
 
@@ -45,9 +32,9 @@ class DocumentsByQuery(Resource):
 
         data = []
 
-        from app import mongo
+        from app import mongo, conf
 
-        cursor = mongo.db.documents.find({"query": { "$in": [ObjectId(queryId)]}} )
+        cursor = getattr(getattr(mongo, conf.CURSOR_DB), coll).find({"query": { "$in": [ObjectId(queryId)]}} )
 
         for document in cursor:
             data.append(document)
@@ -61,32 +48,26 @@ class DocumentbyID(Resource):
     def get(self, documentId):
         data = []
 
-        from app import mongo
+        from app import mongo, conf
 
-        data = mongo.db.documents.find_one({'_id': ObjectId(documentId)})
+        data = getattr(getattr(mongo, conf.CURSOR_DB), coll).find_one({'_id': ObjectId(documentId)})
 
         data_sanitized = json.loads(json_util.dumps(data))
 
         return ({"DOCUMENT": data_sanitized})
 
-    def put(self, documentId):
-        # update document data here
-
-        from app import mongo
-
-        return
 
 class DocumentbyIDUserComment(Resource):
 
+
     def put(self, documentId):
-        from app import mongo
+        from app import mongo, conf
         parser = reqparse.RequestParser()
         parser.add_argument('userId', type=str, required=True, help = 'No userId given', location='json' ) # try without location
         parser.add_argument('commentText', type=str, required = True, help = 'No commentText given', location = 'json') # try without location & action
         request_params = parser.parse_args()
-        #result = process_the_request(request_params)
 
-        result = mongo.db.documents.update({'_id': ObjectId(documentId) }, { '$push': {"comments": {"c_user": ObjectId(request_params['userId']), "text": request_params['commentText']}}})
+        result = getattr(getattr(mongo, conf.CURSOR_DB), coll).update({'_id': ObjectId(documentId) }, { '$push': {"comments": {"c_user": ObjectId(request_params['userId']), "text": request_params['commentText']}}})
 
         response = {
              'result': result,
@@ -96,16 +77,11 @@ class DocumentbyIDUserComment(Resource):
         data_sanitized = json.loads(json_util.dumps(response))
         return data_sanitized
 
-    def delete(self):
-        # well... not priority! # but it should be possible to delete comments...
-        return
-
-
 
 class DocumentbyIDUserTag(Resource):
 
     def put(self, documentId):
-        from app import mongo
+        from app import mongo, conf
         parser = reqparse.RequestParser()
         parser.add_argument('userId', type=str, required=True, help='No userId given',
                             location='json')
@@ -113,10 +89,10 @@ class DocumentbyIDUserTag(Resource):
                             location='json')
         request_params = parser.parse_args()
 
-        result1 = mongo.db.documents.update({'_id': ObjectId(documentId)},
+        result1 = getattr(getattr(mongo, conf.CURSOR_DB), coll).update({'_id': ObjectId(documentId)},
                                             {'$pull': {'tags_user': {'t_user': ObjectId(request_params['userId'])}}})
 
-        result = mongo.db.documents.update({'_id': ObjectId(documentId)}, {'$push': {
+        result = getattr(getattr(mongo, conf.CURSOR_DB), coll).update({'_id': ObjectId(documentId)}, {'$push': {
             "tags_user": {"t_user": ObjectId(request_params['userId']), "tags": request_params['tags']}}})
 
         response = {
@@ -129,28 +105,20 @@ class DocumentbyIDUserTag(Resource):
         return data_sanitized
 
 
-    def delete(self):
-        # well... not priority! # but it should be possible to delete user-tags...
-        return
-
 
 class DocumentbyIDUserBookmark(Resource):
     def put(self, documentId):
 
-        from app import mongo
+        from app import mongo, conf
         parser = reqparse.RequestParser()
         parser.add_argument('userId', type=str, required=True, help='No userId given',
                             location='json')
         parser.add_argument('bookmarkStatus', type=str, required=True, help='No bookmarkStatus given',
-                            location='json')  # try without location & action
+                            location='json')
         request_params = parser.parse_args()
-        # result = process_the_request(request_params)
 
-        # unfortunately, we have to do two requests here: one, to delete ("pull") the existing bookmark for a specific user
-        # the second to add (push) the bookmark, the user has just chosen
-
-        result1 = mongo.db.documents.update({'_id': ObjectId(documentId)}, { '$pull': {'bookmarks': {'b_user': ObjectId(request_params['userId'])}}})
-        result2 = mongo.db.documents.update({'_id': ObjectId(documentId)}, {
+        result1 = getattr(getattr(mongo, conf.CURSOR_DB), coll).update({'_id': ObjectId(documentId)}, { '$pull': {'bookmarks': {'b_user': ObjectId(request_params['userId'])}}})
+        result2 = getattr(getattr(mongo, conf.CURSOR_DB), coll).update({'_id': ObjectId(documentId)}, {
            '$push': {"bookmarks": {"b_user": ObjectId(request_params['userId']), "status": request_params['bookmarkStatus']}}}, upsert=True)
 
         response = {
@@ -171,7 +139,7 @@ class DocumentbyIDSource(Resource):
 class NewDocument(Resource):
 
     def post(self):
-        from app import mongo
+        from app import mongo, conf
 
         parser = reqparse.RequestParser()
         parser.add_argument('title', type=str, required=True, help='No title given',
@@ -191,7 +159,8 @@ class NewDocument(Resource):
 
 
         try:
-            result = mongo.db.documents.insert({
+
+            result = getattr(getattr(mongo, conf.CURSOR_DB), coll).insert({
                 "abstract": request_params['abstract'],
                 "bookmarks": [],
                 "comments": [],
@@ -217,7 +186,8 @@ class NewDocument(Resource):
 
         # create an index everytime a new doc was inserted, to prevent duplicate entries regarding title!!
         # we could prevent duplicate entries also through unify the url or other metadata..
-        result1 = mongo.db.documents.create_index([('title', pymongo.ASCENDING)], unique=True)
+
+        result1 = getattr(getattr(mongo, conf.CURSOR_DB), coll).create_index([('title', pymongo.ASCENDING)], unique=True)
 
         response = {
             'result': result,
