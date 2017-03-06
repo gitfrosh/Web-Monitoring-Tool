@@ -12,9 +12,10 @@ from flask import Flask, app
 from time import sleep
 from bson import json_util, ObjectId
 from preProcessor import preProcessing
-from app import conf
+
 
 def collectDocuments():
+
 
     listOfactiveQuerys = []
     fetchQuerys(listOfactiveQuerys)
@@ -36,6 +37,7 @@ def collectDocuments():
         print("No (active) querys to process!")
 
 def fetchQuerys(listOfactiveQuerys):
+    from app import conf
     # fetch current querys entered by user
     url = conf.MYRESTAPI_URL + "/querys/"
     r = requests.get(url).json()
@@ -73,6 +75,7 @@ def fetchQuerys(listOfactiveQuerys):
 
 
 def requestWebhose(query):
+    from app import conf
     # set up Api integration for webhose.io
     apiKey = conf.WEBHOSE_APIKEY
     print(apiKey)
@@ -91,6 +94,7 @@ def requestWebhose(query):
 
 
 def saveDocs(preProcessedDocs):
+    from app import conf
 
     print("Try to save preProcessed documents to db...")
 

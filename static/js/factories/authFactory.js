@@ -34,10 +34,10 @@ myApp.factory('AuthService',
 
           console.log("The user has entered data and a HTTP call was made...");
 
-          if(status === 200 && data[0].result){
+          if(status === 200 && data.result){
             user = true;
 
-            loggedInUser.setUserId(data[1].userId);
+            loggedInUser.setUserId(data.userId);
 
             console.log("HTTP call 200 and verification okay.. we just set the loggedInUser-ID to .." +
               loggedInUser.getUserId() + " and we set the user to" + user);
@@ -116,11 +116,11 @@ myApp.factory('AuthService',
 
       .success(function (data) {
 
-           console.log("We just made the HTTP call and got the UserStatus: " + data[0].status + "and Id " + data[1].userId);
+           console.log("We just made the HTTP call and got the UserStatus: " + data.status + "and Id " + data.userId);
 
-        if(data[0].status){
+        if(data.status){
           user = true;
-          loggedInUser.setUserId(data[1].userId);
+          loggedInUser.setUserId(data.userId);
 
 
         } else {

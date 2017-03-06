@@ -24,6 +24,7 @@ from flask import Flask, render_template, request, jsonify,  redirect
 
 
 from flask_pymongo import PyMongo
+from pymongo import MongoClient
 
 import newsApi
 from api.document import *
@@ -45,15 +46,31 @@ def config_loader():
         app.config['SECRET_KEY'] = 'secret_key'  # Default setting in case file does not exist yet
         app.logger.warning('Secret config file not found, secret_key not found. Setting secret_key as default secret_key')
 
+# periodic tasks
+def run_task():
+            app.logger.info('Periodic task started')
+            print("Start periodic task!")
+            newsApi.collectDocuments()
+            # executor.submit(newsApi.collectDocuments)
+
+ # schedule operation
+def run_schedule():
+            app.logger.info('Schedule started')
+            while 1:
+                schedule.run_pending()
+                sleep(1)
 
 #----------------------------------------------------------------------------------------------------------------------
 # Some configuration first
 
 app = Flask(__name__)
 config_loader()
+#schedule.every(120).seconds.do(run_task)
+t = Thread(target=run_schedule)
+t.start()
 
 # initiate Thread and Executor
-executor = ThreadPoolExecutor(max_workers=10)
+#executor = ThreadPoolExecutor(max_workers=10)
 
 # configure MongoDB and driver PyMongo (DEBUG / DEVELOPMENT ENVIRONMENT!!!!!)
 mongo = PyMongo(app, config_prefix='MONGO')
@@ -63,17 +80,7 @@ mongo = PyMongo(app, config_prefix='MONGO')
 
 
 
-# periodic tasks
-def run_task():
-    print("Start periodic task!")
-    executor.submit(newsApi.collectDocuments)
 
-
-# schedule operation
-def run_schedule():
-    while 1:
-        schedule.run_pending()
-        sleep(1)
 
 
 #----------------------------------------------------------------------------------------------------------------------
@@ -152,9 +159,7 @@ myRestApi.add_resource(DocumentbyIDSource, "/api/document/<string:documentId>/ne
 if __name__ == "__main__":
 
 
-    schedule.every(43200).seconds.do(run_task)
-    t = Thread(target=run_schedule)
-    t.start()
+
     app.run()
 
 

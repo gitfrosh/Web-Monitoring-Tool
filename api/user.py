@@ -75,12 +75,12 @@ class UserStatus(Resource):
         if session.get('logged_in'):
             if session['logged_in']:
                 userId_sanitized = json.loads(json_util.dumps(session['userId']))
-                return jsonify({'status': True}, {'userId': userId_sanitized['$oid']})
+                return jsonify({'status': True, 'userId': userId_sanitized['$oid']})
 
             #userId_sanitized['$oid']
 
         else:
-            return jsonify({'status': False}, {'userId': ""})
+            return jsonify({'status': False, 'userId': None})
 
 
 class VerifyUser(Resource):
@@ -120,7 +120,7 @@ class VerifyUser(Resource):
             status = False
 
         userId_sanitized = json.loads(json_util.dumps(userId))
-        return jsonify({'result': status}, {"userId": userId_sanitized['$oid']})
+        return jsonify({'result': status, "userId": userId_sanitized['$oid']})
 
 
 class User(Resource):
