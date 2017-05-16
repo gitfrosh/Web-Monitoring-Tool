@@ -1,30 +1,26 @@
 """This is where all the magic starts. We initiate the db connection, the flask microframework for web applications
-in python, we set up basic routing to realize login, dashboard, errorhandling (404) and set up the scheduling and
-threading of tasks that are executed by the flask server application.
+in python, we load configurations, set up basic routing to realize login, dashboard, errorhandling (404) and set up the scheduling of tasks
+that are executed by the flask server application.
 
 The backend is all python! The frontend is completely standalone AngularJS. AngularJS components are served only in
 the static folders js (app.js, controllers, directives,..) and partials for the view. Backend and Frontend communicate
 via REST. Like that, any component can be substituted.
 
-Communicating via RESTful APIs is essential: we set up an own REST API ("myRestAPI") which handles all incoming CRUD
+Communicating via RESTful APIs is essential: we set up our own REST API ("myRestAPI") which handles all incoming CRUD
 requests from the frontend and moves them on to the MongoDB.
 
 Additionally we need to talk to external APIs where we fetch the actual documents. This is realized through "newsApi.py"
-and the PreProcessor."""
-import logging
-from concurrent.futures import ThreadPoolExecutor
+and the PreProcessor. The prototype uses webhose.io for examplified monitoring. """
+
 from threading import Thread
 from time import sleep
 
 
-import executor as executor
-import requests
 import schedule
-from flask import Flask, render_template, request, jsonify,  redirect
+from flask import Flask, render_template, redirect
 
 
 from flask_pymongo import PyMongo
-from pymongo import MongoClient
 
 import newsApi
 from api.document import *
@@ -46,15 +42,17 @@ def config_loader():
         app.config['SECRET_KEY'] = 'secret_key'  # Default setting in case file does not exist yet
         app.logger.warning('Secret config file not found, secret_key not found. Setting secret_key as default secret_key')
 
-# periodic tasks
+
 def run_task():
+    # periodic tasks
             app.logger.info('Periodic task started')
             print("Start periodic task!")
             newsApi.collectDocuments()
-            # executor.submit(newsApi.collectDocuments)
 
- # schedule operation
+
+
 def run_schedule():
+    # schedule operation
             app.logger.info('Schedule started')
             while 1:
                 schedule.run_pending()
@@ -65,17 +63,17 @@ def run_schedule():
 
 app = Flask(__name__)
 config_loader()
-#schedule.every(120).seconds.do(run_task)
+
+# ENABLE (uncomment) THE SCHEDULOR IF YOU WANT TO TRY OUT WEBHOSE.IO MONITORING! (runs every twelve hours then)
+#schedule.every(43200).seconds.do(run_task)
 t = Thread(target=run_schedule)
 t.start()
 
-# initiate Thread and Executor
-#executor = ThreadPoolExecutor(max_workers=10)
 
-# configure MongoDB and driver PyMongo (DEBUG / DEVELOPMENT ENVIRONMENT!!!!!)
+# configure MongoDB and driver PyMongo (DEBUG / DEVELOPMENT ENVIRONMENT (with Werkzeug server) !!!!!) starts on http://127.0.0.1:5000/
 mongo = PyMongo(app, config_prefix='MONGO')
 
-# configure MongoDB and driver PyMongo (PRODUCTION ENVIRONMENT HEROKU!!!!!)
+# configure MongoDB and driver PyMongo (uncomment for PRODUCTION ENVIRONMENT HEROKU (with Gunicorn) !!!!!)
 #mongo = MongoClient(conf.mongo_db_uri)
 
 

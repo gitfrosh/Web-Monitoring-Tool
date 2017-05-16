@@ -1,5 +1,5 @@
 """The PreProcessor cleans, transforms and extracts data from the raw data (fetchedDocs)
-THIS IS ONLY WORKING FOR webhose.io DATA!!
+THIS IS ONLY MADE FOR webhose.io DATA!!
 """
 import rakeNLP
 
@@ -19,7 +19,7 @@ def preProcessing(fetchedDocs, query):
         addQuery(doc, query)
         #print(doc)
         extractTags(doc)
-        print(doc)
+        #print(doc)
         chopAbstract(doc)
         print(doc)
 

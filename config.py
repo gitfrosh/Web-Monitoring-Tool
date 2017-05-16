@@ -3,24 +3,19 @@ use_reloader = False
 DEBUG = True
 threaded = True
 TIMEZONE = 'Europe/Oslo'
-APP_LOG_FILE = 'logs/flask_app.log'
-SECRET_KEY = 'secret_key'
+APP_LOG_FILE = 'logs/flask_app.log' # not working
+SECRET_KEY = 'secret_key' # whatever you want
 use_debugger=True
+WEBHOSE_APIKEY = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' # your webhose API Key
 
 # only in DEVELOPMENT ENVIRONMENT
-MONGO_DBNAME = 'wmt-test'
-
-WEBHOSE_APIKEY = '99105d4f-bdaa-4ae6-8944-be95bf482266'
-
-# only in DEVELOPMENT ENVIRONMENT
-MYRESTAPI_URL = 'http://0.0.0.0:5000/api'
-
-# PRODUCTION ENVIRONMENT HEROKU
-#MYRESTAPI_URL = 'http://wm-tool.herokuapp.com/api'
-#mongo_db_uri = "mongodb://heroku_99b8pdxw:86gckmufoddor0so4hh24fs3fm@ds145009.mlab.com:45009/heroku_99b8pdxw"
-
-# only in DEVELOPMENT ENVIRONMENT
+MONGO_DBNAME = 'wmt-test' # whatever you want
+MYRESTAPI_URL = 'http://0.0.0.0:5000/api' # your local api base url
 CURSOR_DB = "db"
 
-# PRODUCTION ENVIRONMENT HEROKU
-#CURSOR_DB = "heroku_99b8pdxw"
+# enable for PRODUCTION ENVIRONMENT HEROKU
+#MYRESTAPI_URL = 'http://wm-tool.herokuapp.com/api' # example
+#mongo_db_uri = "mongodb://heroku_xxxxxxxx:xxxxxxxxxxxxxxxxxxxxxxxxxx@xxxxxxxx.mlab.com:45009/heroku_xxxxxxxx" # your whatever mongodb_heroku_uri
+
+# enable for PRODUCTION ENVIRONMENT HEROKU
+#CURSOR_DB = "heroku_xxxxxxxx"
